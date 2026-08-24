@@ -1,0 +1,299 @@
+/* Fuentes */
+body {
+    font-family: "Poppins", sans-serif;
+    background-color: #0a0a0a;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+.caprasimo-regular {
+    font-family: "Caprasimo", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgba(10, 10, 10, 0.85) !important;
+}
+
+.navbar-minimal .navbar-left {
+    flex: 1 1 0;
+}
+
+.navbar-brand {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.navbar-brand img {
+    height: 50px;
+    width: auto;
+}
+
+.nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: rgba(255, 193, 7, 1);
+}
+
+.cart {
+    color: rgba(255, 193, 7, 1);
+}
+
+/* Navbar 3 secciones */
+.navbar-section {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-center {
+    flex: 1 1 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-center .navbar-nav {
+    align-items: center;
+}
+
+.navbar-center form {
+    width: 100%;
+    max-width: 500px;
+}
+
+.navbar-right {
+    flex: 1 1 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.navbar-right .navbar-nav {
+    align-items: center;
+}
+
+/* Search */
+#search-input {
+    background-color: #fff !important;
+    border-color: rgba(255, 193, 7, 1);
+    color: #000 !important;
+    max-width: 600px;
+    -webkit-autofill: none;
+    border-right: none;
+}
+
+#search-input:-webkit-autofill,
+#search-input:-webkit-autofill:hover,
+#search-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset;
+    -webkit-text-fill-color: #000;
+}
+
+#search-input::placeholder {
+    color: #666;
+}
+
+#search-input:focus,
+#search-input:focus-visible {
+    box-shadow: none;
+    outline: none;
+}
+
+#clear-search {
+    background-color: #fff;
+    border-top: 1px solid rgba(255, 193, 7, 1);
+    border-bottom: 1px solid rgba(255, 193, 7, 1);
+    border-left: none;
+    border-right: none;
+    color: #666;
+}
+
+#clear-search:hover {
+    color: #000;
+}
+
+#search-input::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield !important;
+    cursor: pointer;
+}
+
+/* Contenido */
+#app {
+    color: #fff;
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+#app::-webkit-scrollbar {
+    width: 8px;
+}
+
+#app::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+#app::-webkit-scrollbar-thumb {
+    background: #ffc107;
+    border-radius: 4px;
+}
+
+#app::-webkit-scrollbar-thumb:hover {
+    background: #ffd54f;
+}
+
+/* Toast */
+#app-toast {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+#app-toast .toast-header {
+    background-color: #1a1a1a;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.15);
+}
+
+#app-toast .toast-header.bg-success,
+#app-toast .toast-header.bg-danger {
+    background-color: #1a1a1a !important;
+}
+
+#app-toast .toast-header.bg-success {
+    border-left: 3px solid #28a745;
+}
+
+#app-toast .toast-header.bg-danger {
+    border-left: 3px solid #dc3545;
+}
+
+#app-toast .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.toast-body {
+    color: #ccc;
+}
+
+#app .row {
+    flex-wrap: wrap;
+}
+
+#app h1, #app h2, #app h3 {
+    color: #ffc107;
+}
+
+#app .container {
+    background-color: rgba(10, 10, 10, 0.8);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+#app .form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+#app .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 193, 7, 0.5);
+    color: #fff;
+    box-shadow: none;
+}
+
+#app .form-label {
+    color: #ccc;
+}
+
+/* Hero */
+.hero {
+    height: 100%;
+    background: url('./../assets/vinilos.jpg') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    color: #ffc107;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #ddd;
+}
+
+#catalog {
+    min-height: 100vh;
+}
+
+/* Cards */
+#app .card {
+    background-color: rgba(10, 10, 10, 0.85);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    border-radius: 12px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+#app .card:hover {
+    border-color: rgba(255, 193, 7, 0.6);
+}
+
+#app .card-title {
+    color: #ffc107;
+}
+
+#app .card-text {
+    color: #ccc;
+}
+
+#app .card .btn-primary {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 500;
+}
+
+#app .card .btn-primary:hover {
+    background-color: #ffd54f;
+    border-color: #ffd54f;
+}
