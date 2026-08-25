@@ -98,6 +98,25 @@
                         "email" => $row["email"],
                         "role" => $row["role"],
                     ];
+
+                    $session_cart = $_SESSION["cart"] ?? [];
+                    if (!empty($session_cart)) {
+                        foreach ($session_cart as $id_product => $qty) {
+                            $sql_check = "SELECT id_cart, quantity FROM cart 
+                                          WHERE id_user = {$row['id_user']} AND id_product = $id_product";
+                            $res_cart = $con->query($sql_check);
+                            if ($res_cart && $res_cart->num_rows > 0) {
+                                $row_cart = $res_cart->fetch_assoc();
+                                $new_qty = $row_cart["quantity"] + $qty;
+                                $con->query("UPDATE cart SET quantity = $new_qty WHERE id_cart = {$row_cart['id_cart']}");
+                            } else {
+                                $con->query("INSERT INTO cart (id_user, id_product, quantity) 
+                                             VALUES ({$row['id_user']}, $id_product, $qty)");
+                            }
+                        }
+                        unset($_SESSION["cart"]);
+                    }
+
                     echo json_encode(["ok" => true, "message" => "Usuario logueado con éxito"]);
                 } else {
                     echo json_encode(["ok" => false, "error" => "Debes activar tu cuenta!"]);

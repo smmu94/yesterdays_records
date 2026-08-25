@@ -114,24 +114,24 @@ CREATE TABLE order_detail (
 -- Added "Accessories" beyond your 4 examples, since the catalog
 -- includes cleaning kits/needles/sleeves that don't fit the other 4
 INSERT INTO categories (name) VALUES
-('Vinyls'),
+('Vinilos'),
 ('Cassettes'),
 ('CDs'),
 ('Merchandising'),
-('Accessories');
+('Accesorios');
 
 -- Genres (matches the actual products below)
 INSERT INTO genres (name) VALUES
 ('Rock'),
-('Progressive Rock'),
+('Rock Progresivo'),
 ('Pop'),
 ('Grunge'),
 ('Hard Rock'),
-('Electronic'),
+('Electrónica'),
 ('Funk'),
 ('Reggae'),
-('Alternative'),
-('Psychedelic'),
+('Alternativo'),
+('Psicodélico'),
 ('R&B');
 
 -- Cities
@@ -155,29 +155,29 @@ INSERT INTO users (name, email, password, role, token, token_expire, status) VAL
 
 -- Products
 INSERT INTO products (name, description, id_category, id_genre, artist, price, stock, image) VALUES
-('Rumours', 'Vinyl edition of the classic 1977 album.', 1, 1, 'Fleetwood Mac', 24.99, 12, 'https://picsum.photos/seed/rumours/400/400'),
-('The Dark Side of the Moon', 'Remastered edition, includes poster and stickers.', 1, 2, 'Pink Floyd', 27.50, 8, 'https://picsum.photos/seed/darkside/400/400'),
-('Thriller', 'Best-selling album of all time, on 180g vinyl.', 1, 3, 'Michael Jackson', 22.00, 15, 'https://picsum.photos/seed/thriller/400/400'),
-('Nevermind', 'Standard edition, original cover art.', 1, 4, 'Nirvana', 23.75, 10, 'https://picsum.photos/seed/nevermind/400/400'),
-('Back in Black', 'Classic black vinyl, remastered sound.', 1, 5, 'AC/DC', 25.99, 6, 'https://picsum.photos/seed/backinblack/400/400'),
-('Random Access Memories', 'Double vinyl, includes credits booklet.', 1, 6, 'Daft Punk', 29.99, 5, 'https://picsum.photos/seed/ram/400/400'),
+('Rumours', 'Edición en vinilo del clásico álbum de 1977.', 1, 1, 'Fleetwood Mac', 24.99, 12, 'https://picsum.photos/seed/rumours/400/400'),
+('The Dark Side of the Moon', 'Edición remasterizada, incluye póster y pegatinas.', 1, 2, 'Pink Floyd', 27.50, 8, 'https://picsum.photos/seed/darkside/400/400'),
+('Thriller', 'El álbum más vendido de la historia, en vinilo de 180g.', 1, 3, 'Michael Jackson', 22.00, 15, 'https://picsum.photos/seed/thriller/400/400'),
+('Nevermind', 'Edición estándar, portada original.', 1, 4, 'Nirvana', 23.75, 10, 'https://picsum.photos/seed/nevermind/400/400'),
+('Back in Black', 'Vinilo negro clásico, sonido remasterizado.', 1, 5, 'AC/DC', 25.99, 6, 'https://picsum.photos/seed/backinblack/400/400'),
+('Random Access Memories', 'Doble vinilo, incluye booklet de créditos.', 1, 6, 'Daft Punk', 29.99, 5, 'https://picsum.photos/seed/ram/400/400'),
 
-('Purple Rain', 'Reissued cassette, warm analog sound.', 2, 7, 'Prince', 14.50, 9, 'https://picsum.photos/seed/purplerain/400/400'),
-('Legend', 'Greatest hits on cassette, original 80s format.', 2, 8, 'Bob Marley & The Wailers', 13.00, 11, 'https://picsum.photos/seed/legend/400/400'),
-('1989', 'Limited edition on colored cassette.', 2, 3, 'Taylor Swift', 15.99, 7, 'https://picsum.photos/seed/1989/400/400'),
+('Purple Rain', 'Cassette reeditado, sonido analógico cálido.', 2, 7, 'Prince', 14.50, 9, 'https://picsum.photos/seed/purplerain/400/400'),
+('Legend', 'Grandes éxitos en cassette, formato original de los 80.', 2, 8, 'Bob Marley & The Wailers', 13.00, 11, 'https://picsum.photos/seed/legend/400/400'),
+('1989', 'Edición limitada en cassette de color.', 2, 3, 'Taylor Swift', 15.99, 7, 'https://picsum.photos/seed/1989/400/400'),
 
-('OK Computer', 'CD with lyrics booklet included.', 3, 9, 'Radiohead', 16.99, 14, 'https://picsum.photos/seed/okcomputer/400/400'),
-('Abbey Road', 'Remastered on CD, restored sound.', 3, 1, 'The Beatles', 17.50, 10, 'https://picsum.photos/seed/abbeyroad/400/400'),
-('Currents', 'Standard CD in a jewel case.', 3, 10, 'Tame Impala', 15.50, 13, 'https://picsum.photos/seed/currents/400/400'),
-('Blonde', 'Import edition on CD.', 3, 11, 'Frank Ocean', 18.00, 6, 'https://picsum.photos/seed/blonde/400/400'),
+('OK Computer', 'CD con booklet de letras incluido.', 3, 9, 'Radiohead', 16.99, 14, 'https://picsum.photos/seed/okcomputer/400/400'),
+('Abbey Road', 'Remasterizado en CD, sonido restaurado.', 3, 1, 'The Beatles', 17.50, 10, 'https://picsum.photos/seed/abbeyroad/400/400'),
+('Currents', 'CD estándar en estuche de plástico.', 3, 10, 'Tame Impala', 15.50, 13, 'https://picsum.photos/seed/currents/400/400'),
+('Blonde', 'Edición de importación en CD.', 3, 11, 'Frank Ocean', 18.00, 6, 'https://picsum.photos/seed/blonde/400/400'),
 
-('Vintage Logo T-Shirt', 'Cotton t-shirt with screen-printed retro logo.', 4, NULL, 'Tienda Retro', 19.99, 25, 'https://picsum.photos/seed/camiseta1/400/400'),
-('Vinyl Tote Bag', 'Printed canvas bag, perfect for carrying your records.', 4, NULL, 'Tienda Retro', 12.99, 30, 'https://picsum.photos/seed/totebag/400/400'),
-('Retro Records Cap', 'Adjustable embroidered cap.', 4, NULL, 'Tienda Retro', 16.50, 18, 'https://picsum.photos/seed/gorra/400/400'),
+('Camiseta Logo Vintage', 'Camiseta de algodón con logo retro serigrafiado.', 4, NULL, 'Tienda Retro', 19.99, 25, 'https://picsum.photos/seed/camiseta1/400/400'),
+('Tote Bag de Vinilo', 'Bolsa de lona estampada, perfecta para llevar tus discos.', 4, NULL, 'Tienda Retro', 12.99, 30, 'https://picsum.photos/seed/totebag/400/400'),
+('Gorra Retro Records', 'Gorra ajustable bordada.', 4, NULL, 'Tienda Retro', 16.50, 18, 'https://picsum.photos/seed/gorra/400/400'),
 
-('Vinyl Cleaning Kit', 'Anti-static cleaning kit for vinyl records.', 5, NULL, 'AudioCare', 9.99, 40, 'https://picsum.photos/seed/limpiador/400/400'),
-('Inner Sleeves x10', 'Pack of 10 anti-static inner sleeves.', 5, NULL, 'AudioCare', 7.50, 50, 'https://picsum.photos/seed/fundas/400/400'),
-('Replacement Needle', 'Universal replacement needle for turntables.', 5, NULL, 'SoundTech', 21.00, 20, 'https://picsum.photos/seed/aguja/400/400');
+('Kit de Limpieza de Vinilo', 'Kit de limpieza antiestática para discos de vinilo.', 5, NULL, 'AudioCare', 9.99, 40, 'https://picsum.photos/seed/limpiador/400/400'),
+('Fundas Internas x10', 'Pack de 10 fundas internas antiestáticas.', 5, NULL, 'AudioCare', 7.50, 50, 'https://picsum.photos/seed/fundas/400/400'),
+('Aguja de Repuesto', 'Aguja universal de repuesto para tornamesas.', 5, NULL, 'SoundTech', 21.00, 20, 'https://picsum.photos/seed/aguja/400/400');
 -- ^ Merchandising and Accessories items use id_genre = NULL since
 --   "genre" doesn't really apply to them — only vinyls/cassettes/CDs have a real one
 

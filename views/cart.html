@@ -1,0 +1,39 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#/home" class="text-warning">Catálogo</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Carrito</li>
+                </ol>
+            </nav>
+            <div id="cart-loading" class="text-center py-5">
+                <div class="spinner-border text-warning"></div>
+            </div>
+            <div id="cart-empty" style="display:none;" class="text-center py-5">
+                <i class="bi bi-cart fs-1 text-secondary d-block mb-3"></i>
+                <h3>Tu carrito está vacío</h3>
+                <p class="text-secondary">Agrega productos desde el catálogo.</p>
+                <a class="btn btn-warning mt-2" id="btn-go-catalog">Ver catálogo</a>
+            </div>
+            <div id="cart-content" style="display:none;">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items"></tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h4 class="mb-0">Total: <span class="text-warning" id="cart-total">0</span> €</h4>
+                    <a href="#/checkout" class="btn btn-warning">Proceder al pago</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

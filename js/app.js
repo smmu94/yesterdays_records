@@ -3,7 +3,8 @@ var routes = {
     "#/login": "views/login.html",
     "#/register": "views/register.html",
     "#/verify": "views/verify.html",
-    "#/profile": "views/profile.html"
+    "#/profile": "views/profile.html",
+    "#/cart": "views/cart.html"
 };
 
 var session = { logged_in: false };
@@ -14,7 +15,7 @@ var activeGenre = "";
 async function loadView(hash) {
     var cleanHash = hash.split("?")[0];
     var view = routes[cleanHash];
-    var publicRoutes = ["#/home", "#/login", "#/register", "#/verify"];
+    var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart"];
 
     if(cleanHash.startsWith("#/product")){
         view =  "views/product.html";
@@ -49,7 +50,6 @@ async function loadView(hash) {
                 "product-artist": "artist",
                 "product-description": "description",
                 "product-price": "price",
-                "product-stock": "stock"
             };
 
             $.each(fields, function(elementId, apiKey) {
@@ -58,6 +58,7 @@ async function loadView(hash) {
             
             $("#product-image").attr("src", data.product.image).attr("alt", data.product.product_name);
             $("#product-breadcrumb").text(data.product.product_name);
+            $(".btn-add-cart").attr("data-id", data.product.id_product);
     
             $("#product-detail").show();
             $("#product-loading").hide();
@@ -65,6 +66,10 @@ async function loadView(hash) {
             $("#product-loading").hide();
             $("#product-error h3").text(data.message);
         }
+    }
+
+    if (cleanHash === "#/cart") {
+        await loadCart();
     }
 
     if (cleanHash === "#/login" || cleanHash === "#/register" || cleanHash === "#/verify") {
@@ -91,9 +96,7 @@ async function loadView(hash) {
     }
 
     $("#btn-explore").on("click", function () {
-        var catalog = document.getElementById("catalog");
-        var app = document.getElementById("app");
-        app.scrollTo({ top: catalog.offsetTop - app.offsetTop, behavior: "smooth" });
+        scrollToCatalog();
     });
 
     if (view === "views/home.html") {
@@ -140,6 +143,13 @@ function registerNavEvents() {
     });
 }
 
+function scrollToCatalog() {
+    var catalog = document.getElementById("catalog");
+    if (catalog) {
+        catalog.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
 async function init() {
     var navbar = await $.get("views/navbar.html");
     $("#navbar").html(navbar);
@@ -149,6 +159,8 @@ async function init() {
 
     registerNavEvents();
     registerCatalogEvents();
+    registerCartEvents();
+    updateCartCount();
 }
 
 $(window).on("popstate", function () {

@@ -49,7 +49,29 @@ html {
 }
 
 .cart {
-    color: rgba(255, 193, 7, 1);
+    color: rgba(255, 193, 7, 1) !important;
+    position: relative;
+    padding: 0.25rem 0.5rem !important;
+}
+
+#cart-count {
+    position: absolute;
+    top: 0;
+    right: -4px;
+    font-size: 0.6rem;
+    padding: 0.2em 0.4em;
+}
+
+.navbar-right .nav-item + .nav-item {
+    margin-left: 0.75rem;
+}
+
+.breadcrumb-item.active {
+    color: #e0e0e0 !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: #888;
 }
 
 /* Navbar 3 secciones */
