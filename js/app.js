@@ -16,7 +16,9 @@ async function loadView(hash) {
     var view = routes[cleanHash];
     var publicRoutes = ["#/home", "#/login", "#/register", "#/verify"];
 
-    if (!routes[cleanHash]) {
+    if(cleanHash.startsWith("#/product")){
+        view =  "views/product.html";
+    } else if (!routes[cleanHash]) {
         history.pushState(null, "", "#/home");
         view = routes["#/home"];
     } else if (!session.logged_in && !publicRoutes.includes(cleanHash)) {
@@ -33,6 +35,37 @@ async function loadView(hash) {
     var html = await $.get(view);
     $("#app").html(html);
     $("#app").scrollTop(0);
+
+    if(cleanHash.startsWith("#/product/")) {
+        var id = cleanHash.split("/")[2];
+        var response = await $.get(`api/product.php?id=${id}`);
+        var data = JSON.parse(response);
+    
+        if(data.ok){
+
+            var fields = {
+                "product-category": "category_name",
+                "product-name": "product_name",
+                "product-artist": "artist",
+                "product-description": "description",
+                "product-price": "price",
+                "product-stock": "stock"
+            };
+
+            $.each(fields, function(elementId, apiKey) {
+                $(`#${elementId}`).text(data.product[apiKey]);
+            })
+            
+            $("#product-image").attr("src", data.product.image).attr("alt", data.product.product_name);
+            $("#product-breadcrumb").text(data.product.product_name);
+    
+            $("#product-detail").show();
+            $("#product-loading").hide();
+        } else {
+            $("#product-loading").hide();
+            $("#product-error h3").text(data.message);
+        }
+    }
 
     if (cleanHash === "#/login" || cleanHash === "#/register" || cleanHash === "#/verify") {
         $(".navbar-center, .navbar-right").hide();

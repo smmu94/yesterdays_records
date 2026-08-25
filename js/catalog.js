@@ -119,4 +119,11 @@ function registerCatalogEvents() {
         }
         $("#search-input").focus();
     });
+
+    $("body").on("click", ".card", function(event) {
+        if ($(event.target).closest(".btn-add-cart").length) return;
+        var id = $(this).find("button").data("id");
+        history.pushState(null, "", `#/product/${id}`);
+        loadView(`#/product/${id}`);
+    })
 }
