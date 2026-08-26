@@ -4,7 +4,9 @@ var routes = {
     "#/register": "views/register.html",
     "#/verify": "views/verify.html",
     "#/profile": "views/profile.html",
-    "#/cart": "views/cart.html"
+    "#/cart": "views/cart.html",
+    "#/checkout": "views/checkout.html",
+    "#/order-success": "views/order-success.html"
 };
 
 var session = { logged_in: false };
@@ -70,6 +72,24 @@ async function loadView(hash) {
 
     if (cleanHash === "#/cart") {
         await loadCart();
+        var params = new URLSearchParams(window.location.hash.split("?")[1]);
+        if (params.get("canceled") === "1") {
+            showToast("Pago cancelado", "Tu pedido no fue procesado", "warning");
+            history.replaceState(null, "", "#/cart");
+        }
+    }
+
+    if (cleanHash === "#/checkout") {
+        await loadCheckout();
+    }
+
+    if (cleanHash === "#/order-success") {
+        var params = new URLSearchParams(window.location.hash.split("?")[1]);
+        var orderId = params.get("id");
+        if (orderId) {
+            $("#order-id").text(orderId);
+             $.post("api/checkout.php", { action: "confirm", id_order: orderId });
+        }
     }
 
     if (cleanHash === "#/login" || cleanHash === "#/register" || cleanHash === "#/verify") {
@@ -161,6 +181,7 @@ async function init() {
     registerCatalogEvents();
     registerCartEvents();
     updateCartCount();
+    registerCheckoutEvents();
 }
 
 $(window).on("popstate", function () {

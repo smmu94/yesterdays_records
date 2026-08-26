@@ -32,7 +32,7 @@ async function loadProducts(category, genre, search) {
     products.forEach(product => {
         var card = `
             <div class="col-md-4 mb-4">
-                <div class="card h-100">
+                <div class="card product-card h-100">
                     <img src="${product.image}" class="card-img-top" alt="${product.product_name}">
                     <div class="card-body">
                         <h5 class="card-title">${product.product_name}</h5>
@@ -120,9 +120,9 @@ function registerCatalogEvents() {
         $("#search-input").focus();
     });
 
-    $("body").on("click", ".card", function(event) {
+    $("body").on("click", ".product-card", function(event) {
         if ($(event.target).closest(".btn-add-cart").length) return;
-        var id = $(this).find("button").data("id");
+        var id = $(this).find("button").attr("data-id");
         history.pushState(null, "", `#/product/${id}`);
         loadView(`#/product/${id}`);
     })

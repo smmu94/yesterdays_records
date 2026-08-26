@@ -319,3 +319,94 @@ html {
     background-color: #ffd54f;
     border-color: #ffd54f;
 }
+
+/* Checkout cards */
+.checkout {
+    background-color: transparent !important;
+}
+
+.checkout .card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+}
+
+.checkout .card-header {
+    background-color: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 12px 12px 0 0 !important;
+    color: #222;
+    font-weight: 600;
+}
+
+.checkout .card-body {
+    padding: 1.5rem;
+    color: #333;
+    background-color: #fff;
+}
+
+.checkout .form-check-label {
+    color: #222 !important;
+    font-weight: 500;
+}
+
+.checkout .form-label {
+    color: #333 !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.checkout .form-control,
+.checkout .form-select {
+    background-color: #fff !important;
+    border: 1px solid #ccc !important;
+    color: #222 !important;
+    border-radius: 8px;
+}
+
+.checkout .form-control:focus,
+.checkout .form-select:focus {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.15) !important;
+    color: #222 !important;
+    background-color: #fff !important;
+}
+
+.checkout .form-control::placeholder {
+    color: #888 !important;
+}
+
+.checkout .form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.checkout h2 {
+    color: #222 !important;
+}
+
+.checkout h4 {
+    color: #222 !important;
+}
+
+.checkout .breadcrumb-item.active {
+    color: #666 !important;
+}
+
+.checkout .breadcrumb-item a {
+    color: #ffc107 !important;
+}
+
+.checkout #btn-pay {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.checkout #btn-pay:hover {
+    background-color: #e6ac00;
+    border-color: #e6ac00;
+}
+
