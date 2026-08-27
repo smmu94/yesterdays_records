@@ -410,3 +410,43 @@ html {
     border-color: #e6ac00;
 }
 
+/* Spinner */
+.spinner-border {
+    --bs-spinner-width: 2rem;
+    --bs-spinner-height: 2rem;
+}
+
+/* Admin */
+.admin-form .form-control,
+.admin-form .form-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.admin-form .form-control:focus,
+.admin-form .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 193, 7, 0.5);
+    color: #fff;
+    box-shadow: none;
+}
+
+.admin-form .form-label {
+    color: #ccc;
+}
+
+#image-preview-container {
+    margin-top: 0.5rem;
+}
+
+.table-dark {
+    --bs-table-bg: rgba(10, 10, 10, 0.85);
+    --bs-table-border-color: rgba(255, 193, 7, 0.15);
+}
+
+.badge-status {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+

@@ -9,6 +9,27 @@
         error("Acceso denegado");
     }
 
+    function handle_image_upload() {
+        if (!isset($_FILES["image"]) || $_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $dir = __DIR__ . "/../uploads/products/";
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+        $filename = time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
+        $route = $dir . $filename;
+
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $route)) {
+            return "uploads/products/" . $filename;
+        }
+
+        return null;
+    }
+
     if ($action === "list_products") {
         $res = $con->query("SELECT * FROM v_products ORDER BY name");
         if ($res && $res->num_rows > 0) {
@@ -26,7 +47,11 @@
         $stock = intval($_POST["stock"]);
         $id_category = intval($_POST["id_category"]);
         $id_genre = intval($_POST["id_genre"]);
-        $image = $con->real_escape_string($_POST["image"]);
+
+        $image = handle_image_upload();
+        if ($image === null) {
+            error("Error al subir la imagen");
+        }
 
         $sql = "INSERT INTO products (name, description, id_category, id_genre, artist, price, stock, image)
                 VALUES ('$name', '$description', $id_category, $id_genre, '$artist', $price, $stock, '$image')";
@@ -56,11 +81,15 @@
         $stock = intval($_POST["stock"]);
         $id_category = intval($_POST["id_category"]);
         $id_genre = intval($_POST["id_genre"]);
-        $image = $con->real_escape_string($_POST["image"]);
+
+        $image = handle_image_upload();
+        if ($image !== null) {
+            $con->query("UPDATE products SET image='$image' WHERE id_product=$id");
+        }
 
         $sql = "UPDATE products SET name='$name', description='$description',
                 id_category=$id_category, id_genre=$id_genre, artist='$artist',
-                price=$price, stock=$stock, image='$image'
+                price=$price, stock=$stock
                 WHERE id_product=$id";
         if ($con->query($sql)) {
             success();
@@ -71,6 +100,16 @@
 
     if ($action === "delete_product") {
         $id = intval($_POST["id_product"]);
+
+        $res = $con->query("SELECT image FROM products WHERE id_product = $id");
+        if ($res && $res->num_rows > 0) {
+            $row = $res->fetch_assoc();
+            $image_path = __DIR__ . "/../" . $row["image"];
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
+
         if ($con->query("DELETE FROM products WHERE id_product = $id")) {
             success();
         } else {

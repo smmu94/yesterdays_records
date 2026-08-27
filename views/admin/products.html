@@ -1,0 +1,30 @@
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="#/home">Inicio</a></li>
+            <li class="breadcrumb-item active">Administrar Productos</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Productos</h2>
+        <a href="#/admin/product/new" class="btn btn-warning"><i class="bi bi-plus-lg"></i> Nuevo Producto</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Artista</th>
+                    <th>Categoria</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="admin-products-body">
+                <tr id="products-loading"><td colspan="7" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
