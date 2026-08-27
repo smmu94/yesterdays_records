@@ -1,40 +1,38 @@
 <?php
     include(__DIR__."/../config/database.php");
+    include(__DIR__."/../config/helpers.php");
     include(__DIR__."/../config/keys.php");
     include(__DIR__."/../vendor/autoload.php");
-
     session_start();
 
-    $logged_in = isset($_SESSION["logueado"]);
     $action = $_GET["action"] ?? $_POST["action"] ?? "";
 
-    if (!$logged_in) {
-        echo json_encode(["ok" => false, "error" => "Debes iniciar sesión"]);
-        exit;
+    if (!is_logged_in()) {
+        error("Debes iniciar sesion");
     }
 
-    $id_user = $_SESSION["logueado"]["id"];
+    $id_user = get_user_id();
 
     if ($action === "confirm") {
         $id_order = intval($_POST["id_order"] ?? 0);
-        $sql_update_order_status = "UPDATE orders SET status = 'paid', paid_date = NOW() 
-                                    WHERE id_order = $id_order AND id_user = $id_user";
-        $con->query($sql_update_order_status);
-        echo json_encode(["ok" => true]);
-        exit;
+        $con->query("UPDATE orders SET status = 'paid', paid_date = NOW() 
+                     WHERE id_order = $id_order AND id_user = $id_user");
+        success();
     }
 
-    $sql_cart = "SELECT c.id_product, c.quantity, p.name, p.price, p.stock
-                 FROM cart c
-                 INNER JOIN products p ON c.id_product = p.id_product
-                 WHERE c.id_user = $id_user";
-    $res = $con->query($sql_cart);
+    $res = $con->query("SELECT c.id_product, c.quantity, p.name, p.price, p.stock
+                        FROM cart c
+                        INNER JOIN products p ON c.id_product = p.id_product
+                        WHERE c.id_user = $id_user");
     $items = $res->fetch_all(MYSQLI_ASSOC);
+
+    if (empty($items)) {
+        error("El carrito esta vacio");
+    }
 
     foreach ($items as $item) {
         if ($item["quantity"] > $item["stock"]) {
-            echo json_encode(["ok" => false, "error" => "Stock insuficiente para {$item['name']}"]);
-            exit;
+            error("Stock insuficiente para {$item['name']}");
         }
     }
 
@@ -42,53 +40,41 @@
 
     if (isset($_POST["id_address"])) {
         $id_address = intval($_POST["id_address"]);
-        $sql_check = "SELECT id_address FROM addresses 
-                      WHERE id_address = $id_address AND id_user = $id_user";
-        $res_check = $con->query($sql_check);
+        $res_check = $con->query("SELECT id_address FROM addresses 
+                                  WHERE id_address = $id_address AND id_user = $id_user");
         if ($res_check->num_rows === 0) {
-            echo json_encode(["ok" => false, "error" => "Dirección no válida"]);
-            exit;
+            error("Direccion no valida");
         }
     } else if (isset($_POST["new_address"])) {
-        $street = $_POST["street"];
+        $street = $con->real_escape_string($_POST["street"]);
         $city = intval($_POST["city"]);
-        $cp = $_POST["cp"];
+        $cp = $con->real_escape_string($_POST["cp"]);
 
-        $sql_addr = "INSERT INTO addresses (id_user, id_city, cp, street_address)
-                     VALUES ($id_user, $city, '$cp', '$street')";
-        $con->query($sql_addr);
+        $con->query("INSERT INTO addresses (id_user, id_city, cp, street_address)
+                     VALUES ($id_user, $city, '$cp', '$street')");
         $id_address = $con->insert_id;
     }
 
-    // Calcular total
     $total = 0;
     foreach ($items as $item) {
         $total += $item["price"] * $item["quantity"];
     }
 
-    // Crear pedido en BD
-    $sql_order = "INSERT INTO orders (id_user, id_address, total, status, date)
-                  VALUES ($id_user, $id_address, $total, 'pending', NOW())";
-    $con->query($sql_order);
+    $con->query("INSERT INTO orders (id_user, id_address, total, status, date)
+                 VALUES ($id_user, $id_address, $total, 'pending', NOW())");
     $id_order = $con->insert_id;
 
-    // Crear detalle del pedido + descontar stock
     foreach ($items as $item) {
         $subtotal = $item["price"] * $item["quantity"];
-        $sql_detail = "INSERT INTO order_detail (id_order, id_product, quantity, unit_price)
-                       VALUES ($id_order, {$item['id_product']}, {$item['quantity']}, $subtotal)";
-        $con->query($sql_detail);
+        $con->query("INSERT INTO order_detail (id_order, id_product, quantity, unit_price)
+                     VALUES ($id_order, {$item['id_product']}, {$item['quantity']}, $subtotal)");
 
         $new_stock = $item["stock"] - $item["quantity"];
-        $sql_update_stock = "UPDATE products SET stock = $new_stock WHERE id_product = {$item['id_product']}";
-        $con->query($sql_update_stock);
+        $con->query("UPDATE products SET stock = $new_stock WHERE id_product = {$item['id_product']}");
     }
 
-    // Limpiar carrito
-    $sql_delete_cart = "DELETE FROM cart WHERE id_user = $id_user";
-    $con->query($sql_delete_cart);
+    $con->query("DELETE FROM cart WHERE id_user = $id_user");
 
-    // Stripe Checkout Session
     $stripe = new \Stripe\StripeClient(STRIPE_SECRET);
 
     $line_items = [];
@@ -107,10 +93,10 @@
         "payment_method_types" => ["card"],
         "line_items" => $line_items,
         "mode" => "payment",
-        "success_url" => APP_URL."/index.html#/order-success?id=$id_order",
-        "cancel_url" => APP_URL."/index.html#/cart?canceled=1",
+        "success_url" => APP_URL . "/index.html#/order-success?id=$id_order",
+        "cancel_url" => APP_URL . "/index.html#/cart?canceled=1",
         "metadata" => ["id_order" => $id_order],
     ]);
 
-    echo json_encode(["ok" => true, "url" => $session->url]);
+    success(["url" => $session->url]);
 ?>

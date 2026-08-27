@@ -20,7 +20,7 @@ async function loadView(hash) {
     var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart"];
 
     if(cleanHash.startsWith("#/product")){
-        view =  "views/product.html";
+        view = "views/product.html";
     } else if (!routes[cleanHash]) {
         history.pushState(null, "", "#/home");
         view = routes["#/home"];
@@ -42,31 +42,31 @@ async function loadView(hash) {
     if(cleanHash.startsWith("#/product/")) {
         var id = cleanHash.split("/")[2];
         var response = await $.get(`api/product.php?id=${id}`);
-        var data = JSON.parse(response);
-    
-        if(data.ok){
+        var data = typeof response === "string" ? JSON.parse(response) : response;
 
+        if (data.ok === false) {
+            $("#product-loading").hide();
+            $("#product-error h3").text(data.error);
+        } else if (data.product) {
+            var p = data.product;
             var fields = {
                 "product-category": "category_name",
-                "product-name": "product_name",
+                "product-name": "name",
                 "product-artist": "artist",
                 "product-description": "description",
                 "product-price": "price",
             };
 
             $.each(fields, function(elementId, apiKey) {
-                $(`#${elementId}`).text(data.product[apiKey]);
-            })
-            
-            $("#product-image").attr("src", data.product.image).attr("alt", data.product.product_name);
-            $("#product-breadcrumb").text(data.product.product_name);
-            $(".btn-add-cart").attr("data-id", data.product.id_product);
-    
+                $(`#${elementId}`).text(p[apiKey]);
+            });
+
+            $("#product-image").attr("src", p.image).attr("alt", p.name);
+            $("#product-breadcrumb").text(p.name);
+            $(".btn-add-cart").attr("data-id", p.id_product);
+
             $("#product-detail").show();
             $("#product-loading").hide();
-        } else {
-            $("#product-loading").hide();
-            $("#product-error h3").text(data.message);
         }
     }
 
@@ -88,7 +88,7 @@ async function loadView(hash) {
         var orderId = params.get("id");
         if (orderId) {
             $("#order-id").text(orderId);
-             $.post("api/checkout.php", { action: "confirm", id_order: orderId });
+            $.post("api/checkout.php", { action: "confirm", id_order: orderId });
         }
     }
 

@@ -1,6 +1,7 @@
 async function loadCart() {
     var response = await $.get("api/cart.php?action=get");
-    var items = typeof response === "string" ? JSON.parse(response) : response;
+    var data = typeof response === "string" ? JSON.parse(response) : response;
+    var items = data.items || [];
 
     if (items.length === 0) {
         $("#cart-loading").hide();
@@ -69,11 +70,11 @@ function registerCartEvents() {
         var id = $(this).data("id");
         $.post("api/cart.php", { action: "add", id_product: id }, function(response) {
             var data = typeof response === "string" ? JSON.parse(response) : response;
-            if (data.ok) {
+            if (data.ok === false) {
+                showToast("Error", data.error, "danger");
+            } else {
                 showToast("Agregado", "Producto agregado al carrito", "success");
                 updateCartCount();
-            } else {
-                showToast("Error", data.error, "danger");
             }
         });
     });

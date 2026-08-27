@@ -1,41 +1,33 @@
 <?php
     include(__DIR__."/../config/database.php");
+    include(__DIR__."/../config/helpers.php");
 
-    $sql_all_products = "SELECT p.id_product, p.name AS product_name,
-                        p.description, p.artist, p.price,
-                        p.stock, p.image, p.date,
-                        c.name AS category_name,
-                        g.name AS genre_name
-                        FROM products p
-                        INNER JOIN categories c
-                        ON p.id_category = c.id_category
-                        LEFT JOIN genres g
-                        ON p.id_genre = g.id_genre";
+    $sql = "SELECT * FROM v_products";
 
     $condition = "";
 
-    if(isset($_GET["category"]) && $_GET["category"] != ""){
-        $condition.=" AND p.id_category = ".$_GET["category"];
+    if (isset($_GET["category"]) && $_GET["category"] != "") {
+        $condition .= " AND id_category = " . intval($_GET["category"]);
     }
 
-    if(isset($_GET["genre"]) && $_GET["genre"] != ""){
-        $condition.=" AND p.id_genre = ".$_GET["genre"];
+    if (isset($_GET["genre"]) && $_GET["genre"] != "") {
+        $condition .= " AND id_genre = " . intval($_GET["genre"]);
     }
 
     if (isset($_GET["search"]) && $_GET["search"] != "") {
-        $search = $_GET["search"];
-        $condition .= " AND (p.name LIKE '%$search%' OR p.artist LIKE '%$search%')";
+        $search = $con->real_escape_string($_GET["search"]);
+        $condition .= " AND (name LIKE '%$search%' OR artist LIKE '%$search%')";
     }
 
-    if($condition != "") {
-        $sql_all_products.= " WHERE ".substr($condition, 5);
+    if ($condition != "") {
+        $sql .= " WHERE " . substr($condition, 5);
     }
 
-    $res = $con->query($sql_all_products);
+    $res = $con->query($sql);
 
-    if($res->num_rows >0) {
-        echo json_encode($res->fetch_all(MYSQLI_ASSOC));
+    if ($res && $res->num_rows > 0) {
+        success(["products" => $res->fetch_all(MYSQLI_ASSOC)]);
     } else {
-        echo json_encode([]);
+        success(["products" => []]);
     }
 ?>

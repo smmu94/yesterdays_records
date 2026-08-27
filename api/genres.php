@@ -1,6 +1,12 @@
 <?php
     include(__DIR__."/../config/database.php");
-    $sql_genres = "SELECT * FROM genres";
-    $res = $con->query($sql_genres);
-    echo json_encode($res->fetch_all(MYSQLI_ASSOC));
+    include(__DIR__."/../config/helpers.php");
+
+    $res = $con->query("SELECT * FROM genres ORDER BY name");
+
+    if ($res && $res->num_rows > 0) {
+        success(["genres" => $res->fetch_all(MYSQLI_ASSOC)]);
+    } else {
+        success(["genres" => []]);
+    }
 ?>
