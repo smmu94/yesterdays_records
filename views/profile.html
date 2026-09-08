@@ -1,0 +1,81 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#/home" class="text-warning">Catálogo</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Mi Perfil</li>
+                </ol>
+            </nav>
+            <div id="profile-loading" class="text-center py-5">
+                <div class="spinner-border text-warning"></div>
+            </div>
+            <div id="profile-content" style="display:none;">
+                <h2 class="caprasimo-regular mb-4">Mi Perfil</h2>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Datos personales</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Nombre:</strong> <span id="profile-name"></span></p>
+                        <p class="mb-0"><strong>Email:</strong> <span id="profile-email"></span></p>
+                    </div>
+                </div>
+                <h3 class="mb-3">Mis pedidos</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Dirección</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile-orders">
+                            <tr id="orders-loading"><td colspan="5" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="profile-empty" style="display:none;" class="text-center py-5">
+                <i class="bi bi-receipt fs-1 text-secondary d-block mb-3"></i>
+                <h3>No tienes pedidos aún</h3>
+                <p class="text-secondary">Explora nuestro catálogo y haz tu primera compra.</p>
+                <a href="#/home" class="btn btn-warning mt-2">Ver catálogo</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-order-title">Pedido #</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary mb-3" id="modal-order-date"></p>
+                <table class="table table-dark table-hover align-middle mb-3">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Artista</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-order-items"></tbody>
+                </table>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total</strong>
+                    <strong id="modal-order-total"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
