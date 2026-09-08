@@ -1,5 +1,24 @@
-async function loadAdminProducts() {
-    var response = await $.get("api/admin.php", { action: "list_products" });
+var adminProductsPage = 1;
+var adminProductFilters = { search: "", category: "" };
+
+async function loadAdminProducts(page) {
+    if (page !== undefined) adminProductsPage = page;
+
+    var catResponse = await $.get("api/categories.php");
+    var catData = typeof catResponse === "string" ? JSON.parse(catResponse) : catResponse;
+    var categories = catData.categories || [];
+    var catSelect = $("#admin-product-category");
+    if (catSelect.children().length <= 1) {
+        categories.forEach(function(c) {
+            catSelect.append(`<option value="${c.id_category}">${c.name}</option>`);
+        });
+    }
+
+    var params = { action: "list_products", page: adminProductsPage };
+    if (adminProductFilters.category) params.category = adminProductFilters.category;
+    if (adminProductFilters.search) params.search = adminProductFilters.search;
+
+    var response = await $.get("api/admin.php", params);
     var data = typeof response === "string" ? JSON.parse(response) : response;
     var products = data.products || [];
     var tbody = $("#admin-products-body");
@@ -7,6 +26,7 @@ async function loadAdminProducts() {
 
     if (products.length === 0) {
         tbody.html('<tr><td colspan="7" class="text-center py-4">No hay productos</td></tr>');
+        $("#admin-products-pagination").empty();
         return;
     }
 
@@ -27,6 +47,8 @@ async function loadAdminProducts() {
         `;
         tbody.append(row);
     });
+
+    renderAdminPagination("admin-products", data.pages, data.page);
 }
 
 async function loadProductForm(id) {
@@ -189,5 +211,22 @@ function registerAdminProductEvents() {
             };
             reader.readAsDataURL(file);
         }
+    });
+
+    $("body").on("input", "#admin-product-search", function() {
+        adminProductFilters.search = $(this).val();
+        loadAdminProducts(1);
+    });
+
+    $("body").on("change", "#admin-product-category", function() {
+        adminProductFilters.category = $(this).val();
+        loadAdminProducts(1);
+    });
+
+    $("body").on("click", "#admin-product-clear", function() {
+        adminProductFilters = { search: "", category: "" };
+        $("#admin-product-search").val("");
+        $("#admin-product-category").val("");
+        loadAdminProducts(1);
     });
 }

@@ -6,22 +6,40 @@
         </ol>
     </nav>
     <h2 class="mb-4">Pedidos</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input type="text" id="admin-order-search" class="form-control admin-filter-input" placeholder="Buscar por nombre o email...">
+        </div>
+        <div class="col-md-4">
+            <select id="admin-order-status" class="form-select admin-filter-select">
+                <option value="">Todos los estados</option>
+                <option value="pending">Pendiente</option>
+                <option value="paid">Pagado</option>
+                <option value="sent">Enviado</option>
+            </select>
+        </div>
+        <div class="col-md-1 d-flex align-items-stretch">
+            <button class="btn btn-warning w-100" id="admin-order-clear"><i class="bi bi-arrow-counterclockwise"></i></button>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-dark table-hover align-middle">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Cliente</th>
+                    <th>Email</th>
                     <th>Fecha</th>
                     <th>Total</th>
                     <th>Estado</th>
                 </tr>
             </thead>
             <tbody id="admin-orders-body">
-                <tr id="orders-loading"><td colspan="5" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
+                <tr id="orders-loading"><td colspan="6" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
             </tbody>
         </table>
     </div>
+    <div id="admin-orders-pagination" class="d-flex justify-content-center mt-3"></div>
 </div>
 
 <div class="modal fade" id="adminOrderDetailModal" tabindex="-1">

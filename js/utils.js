@@ -10,3 +10,23 @@ function showToast(titulo, mensaje, tipo) {
     var bsToast = new bootstrap.Toast(toast[0]);
     bsToast.show();
 }
+
+function renderAdminPagination(prefix, totalPages, currentPage) {
+    var container = $(`#${prefix}-pagination`);
+    container.empty();
+    if (totalPages <= 1) return;
+
+    var html = '<nav><ul class="pagination">';
+    html += `<li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+        <a class="page-link admin-pagination-btn" href="#" data-prefix="${prefix}" data-page="${currentPage - 1}">&laquo; Anterior</a></li>`;
+
+    for (var i = 1; i <= totalPages; i++) {
+        html += `<li class="page-item ${i === currentPage ? "active" : ""}">
+            <a class="page-link admin-pagination-btn" href="#" data-prefix="${prefix}" data-page="${i}">${i}</a></li>`;
+    }
+
+    html += `<li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a class="page-link admin-pagination-btn" href="#" data-prefix="${prefix}" data-page="${currentPage + 1}">Siguiente &raquo;</a></li>`;
+    html += '</ul></nav>';
+    container.html(html);
+}

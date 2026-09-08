@@ -1,7 +1,15 @@
 var adminOrders = [];
+var adminOrdersPage = 1;
+var adminOrderFilters = { search: "", status: "" };
 
-async function loadAdminOrders() {
-    var response = await $.get("api/admin.php", { action: "list_orders" });
+async function loadAdminOrders(page) {
+    if (page !== undefined) adminOrdersPage = page;
+
+    var params = { action: "list_orders", page: adminOrdersPage };
+    if (adminOrderFilters.status) params.status = adminOrderFilters.status;
+    if (adminOrderFilters.search) params.search = adminOrderFilters.search;
+
+    var response = await $.get("api/admin.php", params);
     var data = typeof response === "string" ? JSON.parse(response) : response;
     adminOrders = data.orders || [];
     var tbody = $("#admin-orders-body");
@@ -9,6 +17,7 @@ async function loadAdminOrders() {
 
     if (adminOrders.length === 0) {
         tbody.html('<tr><td colspan="5" class="text-center py-4">No hay pedidos</td></tr>');
+        $("#admin-orders-pagination").empty();
         return;
     }
 
@@ -23,6 +32,7 @@ async function loadAdminOrders() {
             <tr class="admin-order-row" data-id="${o.id_order}" style="cursor:pointer;">
                 <td>${o.id_order}</td>
                 <td>${o.client_name}</td>
+                <td>${o.email}</td>
                 <td>${o.date}</td>
                 <td>${o.total} €</td>
                 <td><span class="badge ${statusClass}">${statusLabel}</span></td>
@@ -30,6 +40,8 @@ async function loadAdminOrders() {
         `;
         tbody.append(row);
     });
+
+    renderAdminPagination("admin-orders", data.pages, data.page);
 }
 
 function registerAdminOrderEvents() {
@@ -79,5 +91,22 @@ function registerAdminOrderEvents() {
         });
 
         $("#admin-modal-order-total").text(total.toFixed(2) + " €");
+    });
+
+    $("body").on("input", "#admin-order-search", function() {
+        adminOrderFilters.search = $(this).val();
+        loadAdminOrders(1);
+    });
+
+    $("body").on("change", "#admin-order-status", function() {
+        adminOrderFilters.status = $(this).val();
+        loadAdminOrders(1);
+    });
+
+    $("body").on("click", "#admin-order-clear", function() {
+        adminOrderFilters = { search: "", status: "" };
+        $("#admin-order-search").val("");
+        $("#admin-order-status").val("");
+        loadAdminOrders(1);
     });
 }

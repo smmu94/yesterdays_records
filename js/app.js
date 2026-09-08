@@ -243,6 +243,15 @@ async function init() {
     registerProfileEvents();
     registerAdminProductEvents();
     registerAdminOrderEvents();
+
+    $("body").on("click", ".admin-pagination-btn", function(e) {
+        e.preventDefault();
+        var prefix = $(this).data("prefix");
+        var page = $(this).data("page");
+        if (!page || page < 1) return;
+        if (prefix === "admin-products") loadAdminProducts(page);
+        if (prefix === "admin-orders") loadAdminOrders(page);
+    });
 }
 
 $(window).on("popstate", function() {

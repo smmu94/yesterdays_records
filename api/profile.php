@@ -8,9 +8,15 @@
     }
 
     $id_user = get_user_id();
+    $page = max(1, intval($_GET["page"] ?? 1));
+    $limit = 5;
+    $offset = ($page - 1) * $limit;
 
     $res = $con->query("SELECT name, email FROM users WHERE id_user = $id_user");
     $user = $res->fetch_assoc();
+
+    $totalRes = $con->query("SELECT COUNT(*) AS total FROM orders WHERE id_user = $id_user");
+    $total = $totalRes->fetch_assoc()["total"];
 
     $res = $con->query("SELECT o.id_order, o.total, o.status, o.date,
                         a.street_address, a.cp, ci.name AS city_name
@@ -18,7 +24,8 @@
                         INNER JOIN addresses a ON o.id_address = a.id_address
                         INNER JOIN cities ci ON a.id_city = ci.id_city
                         WHERE o.id_user = $id_user
-                        ORDER BY o.date DESC");
+                        ORDER BY o.date DESC
+                        LIMIT $limit OFFSET $offset");
     $orders = $res->fetch_all(MYSQLI_ASSOC);
 
     foreach ($orders as &$order) {
@@ -30,5 +37,11 @@
         $order["items"] = $res->fetch_all(MYSQLI_ASSOC);
     }
 
-    success(["user" => $user, "orders" => $orders]);
+    success([
+        "user" => $user,
+        "orders" => $orders,
+        "total" => intval($total),
+        "page" => $page,
+        "pages" => ceil($total / $limit)
+    ]);
 ?>

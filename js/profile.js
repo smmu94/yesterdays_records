@@ -1,7 +1,10 @@
 var profileOrders = [];
+var profilePage = 1;
 
-async function loadProfile() {
-    var response = await $.get("api/profile.php");
+async function loadProfile(page) {
+    if (page !== undefined) profilePage = page;
+
+    var response = await $.get("api/profile.php", { page: profilePage });
     var data = typeof response === "string" ? JSON.parse(response) : response;
 
     $("#profile-name").text(data.user.name);
@@ -11,7 +14,7 @@ async function loadProfile() {
     var tbody = $("#profile-orders");
     tbody.empty();
 
-    if (data.orders.length === 0) {
+    if (data.orders.length === 0 && profilePage === 1) {
         $("#profile-loading").hide();
         $("#profile-empty").show();
         return;
@@ -28,7 +31,6 @@ async function loadProfile() {
             <tr class="order-row" data-id="${order.id_order}" style="cursor:pointer;">
                 <td>${order.id_order}</td>
                 <td>${order.date}</td>
-                <td>${order.street_address}, ${order.city_name} (${order.cp})</td>
                 <td>${order.total} €</td>
                 <td><span class="badge ${statusClass}">${statusLabel}</span></td>
             </tr>
@@ -36,6 +38,7 @@ async function loadProfile() {
         tbody.append(row);
     });
 
+    renderAdminPagination("profile-orders", data.pages, data.page);
     $("#profile-loading").hide();
     $("#profile-content").show();
 }
@@ -74,5 +77,12 @@ function registerProfileEvents() {
 
         var modal = new bootstrap.Modal(document.getElementById("orderDetailModal"));
         modal.show();
+    });
+
+    $("body").on("click", "#profile-orders-pagination .admin-pagination-btn", function(e) {
+        e.preventDefault();
+        var page = $(this).data("page");
+        if (!page || page < 1) return;
+        loadProfile(page);
     });
 }

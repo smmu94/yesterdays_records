@@ -33,12 +33,39 @@
     }
 
     if ($action === "list_products") {
-        $res = $con->query("SELECT * FROM v_products ORDER BY name");
-        if ($res && $res->num_rows > 0) {
-            success(["products" => $res->fetch_all(MYSQLI_ASSOC)]);
-        } else {
-            success(["products" => []]);
+        $page = max(1, intval($_GET["page"] ?? 1));
+        $limit = 50;
+        $offset = ($page - 1) * $limit;
+
+        $sql = "SELECT * FROM v_products";
+        $countSql = "SELECT COUNT(*) AS total FROM v_products";
+        $condition = "";
+
+        if (isset($_GET["category"]) && $_GET["category"] != "") {
+            $condition .= " AND id_category = " . intval($_GET["category"]);
         }
+        if (isset($_GET["search"]) && $_GET["search"] != "") {
+            $search = $con->real_escape_string($_GET["search"]);
+            $condition .= " AND (name LIKE '%$search%' OR artist LIKE '%$search%')";
+        }
+
+        if ($condition != "") {
+            $where = " WHERE " . substr($condition, 5);
+            $sql .= $where;
+            $countSql .= $where;
+        }
+
+        $totalRes = $con->query($countSql);
+        $total = $totalRes->fetch_assoc()["total"];
+
+        $sql .= " ORDER BY name LIMIT $limit OFFSET $offset";
+        $res = $con->query($sql);
+        success([
+            "products" => $res->num_rows > 0 ? $res->fetch_all(MYSQLI_ASSOC) : [],
+            "total" => intval($total),
+            "page" => $page,
+            "pages" => ceil($total / $limit)
+        ]);
     }
 
     if ($action === "create_product") {
@@ -120,12 +147,40 @@
     }
 
     if ($action === "list_orders") {
-        $res = $con->query("SELECT * FROM v_orders ORDER BY date DESC");
-        if ($res && $res->num_rows > 0) {
-            success(["orders" => $res->fetch_all(MYSQLI_ASSOC)]);
-        } else {
-            success(["orders" => []]);
+        $page = max(1, intval($_GET["page"] ?? 1));
+        $limit = 50;
+        $offset = ($page - 1) * $limit;
+
+        $sql = "SELECT * FROM v_orders";
+        $countSql = "SELECT COUNT(*) AS total FROM v_orders";
+        $condition = "";
+
+        if (isset($_GET["status"]) && $_GET["status"] != "") {
+            $status = $con->real_escape_string($_GET["status"]);
+            $condition .= " AND status = '$status'";
         }
+        if (isset($_GET["search"]) && $_GET["search"] != "") {
+            $search = $con->real_escape_string($_GET["search"]);
+            $condition .= " AND (client_name LIKE '%$search%' OR email LIKE '%$search%')";
+        }
+
+        if ($condition != "") {
+            $where = " WHERE " . substr($condition, 5);
+            $sql .= $where;
+            $countSql .= $where;
+        }
+
+        $totalRes = $con->query($countSql);
+        $total = $totalRes->fetch_assoc()["total"];
+
+        $sql .= " ORDER BY date DESC LIMIT $limit OFFSET $offset";
+        $res = $con->query($sql);
+        success([
+            "orders" => $res->num_rows > 0 ? $res->fetch_all(MYSQLI_ASSOC) : [],
+            "total" => intval($total),
+            "page" => $page,
+            "pages" => ceil($total / $limit)
+        ]);
     }
 
     if ($action === "order_detail") {

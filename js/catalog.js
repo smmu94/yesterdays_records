@@ -1,23 +1,19 @@
-async function loadProducts(category, genre, search) {
-    var url = "api/products.php";
-    var params = [];
+var catalogPage = 1;
 
-    if (category) {
-        params.push(`category=${category}`);
+async function loadProducts(category, genre, search, page) {
+    if (page !== undefined) {
+        catalogPage = page;
+    } else {
+        catalogPage = 1;
     }
 
-    if (genre) {
-        params.push(`genre=${genre}`);
-    }
+    var params = [`page=${catalogPage}`, "limit=20"];
 
-    if (search) {
-        params.push(`search=${search}`);
-    }
+    if (category) params.push(`category=${category}`);
+    if (genre) params.push(`genre=${genre}`);
+    if (search) params.push(`search=${search}`);
 
-    if (params.length > 0) {
-        url = `${url}?${params.join("&")}`;
-    }
-
+    var url = `api/products.php?${params.join("&")}`;
     var response = await $.get(url);
     var data = typeof response === "string" ? JSON.parse(response) : response;
     var products = data.products || [];
@@ -27,6 +23,7 @@ async function loadProducts(category, genre, search) {
 
     if (products.length === 0) {
         grid.html('<div class="col-12 text-center flex-1 py-5"><i class="bi bi-search fs-1 text-light d-block mb-3"></i><h3 class="text-light">No se encontraron productos</h3><p class="text-light fs-5">Intenta con otros filtros o terminos de busqueda.</p></div>');
+        $("#catalog-pagination").empty();
         return;
     }
 
@@ -49,7 +46,40 @@ async function loadProducts(category, genre, search) {
         grid.append(card);
     });
 
+    renderPagination(data.pages, data.page);
     reinitEffects();
+}
+
+function renderPagination(totalPages, currentPage) {
+    var container = $("#catalog-pagination");
+    container.empty();
+
+    if (totalPages <= 1) return;
+
+    var html = '<nav><ul class="pagination">';
+
+    html += `<li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+        <a class="page-link pagination-btn" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
+    </li>`;
+
+    for (var i = 1; i <= totalPages; i++) {
+        if (totalPages > 7 && i > 2 && i < totalPages - 1 && Math.abs(i - currentPage) > 1) {
+            if (i === 3 || i === totalPages - 2) {
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            continue;
+        }
+        html += `<li class="page-item ${i === currentPage ? "active" : ""}">
+            <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+        </li>`;
+    }
+
+    html += `<li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a class="page-link pagination-btn" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
+    </li>`;
+
+    html += '</ul></nav>';
+    container.html(html);
 }
 
 async function loadFilters() {
@@ -83,14 +113,23 @@ function registerCatalogEvents() {
         $("#category-filters .btn").removeClass("active");
         $(this).addClass("active");
         activeCategory = $(this).data("category");
-        loadProducts(activeCategory, activeGenre);
+        loadProducts(activeCategory, activeGenre, currentSearch);
     });
 
     $("body").on("click", "#genre-filters .btn", function() {
         $("#genre-filters .btn").removeClass("active");
         $(this).addClass("active");
         activeGenre = $(this).data("genre");
-        loadProducts(activeCategory, activeGenre);
+        loadProducts(activeCategory, activeGenre, currentSearch);
+    });
+
+    $("body").on("click", ".pagination-btn", function(e) {
+        e.preventDefault();
+        var page = $(this).data("page");
+        if (!page || page < 1) return;
+        loadProducts(activeCategory, activeGenre, currentSearch, page);
+        var catalog = document.getElementById("catalog");
+        if (catalog) catalog.scrollIntoView({ behavior: "smooth" });
     });
 
     $("body").on("submit", "#search-form", async function(event) {
@@ -120,7 +159,7 @@ function registerCatalogEvents() {
         $(this).hide();
         currentSearch = "";
         if ($("#products-grid").length) {
-            loadProducts();
+            loadProducts(activeCategory, activeGenre);
         }
         $("#search-input").focus();
     });
@@ -130,5 +169,5 @@ function registerCatalogEvents() {
         var id = $(this).find("button").attr("data-id");
         history.pushState(null, "", `#/product/${id}`);
         loadView(`#/product/${id}`);
-    })
+    });
 }
