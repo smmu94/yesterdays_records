@@ -1,0 +1,175 @@
+/* ==========================================================
+   MICRO-EFFECTS — Yesterday's Records
+   Cada efecto es independiente. Para desactivar uno, comenta
+   su bloque de CSS y, si tiene JS, su init correspondiente.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. SCROLL REVEAL — Fade-in + translate al entrar al viewport
+      Para desactivar: comentar este bloque y la línea
+      "initScrollReveal()" en effects.js
+   ========================================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+}
+
+.reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Respecta reduced-motion: sin transición, solo aparece */
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+
+/* ==========================================================
+   2. HOVER EN TARJETAS — Lift + shadow expandido
+      Para desactivar: comentar este bloque completo
+   ========================================================== */
+.product-card {
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out,
+                border-color 0.25s ease-out;
+    will-change: transform;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45),
+                0 4px 10px rgba(255, 193, 7, 0.08);
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+/* Reduced-motion: sin lift */
+@media (prefers-reduced-motion: reduce) {
+    .product-card {
+        transition: none;
+    }
+    .product-card:hover {
+        transform: none;
+    }
+}
+
+
+/* ==========================================================
+   3. BOTÓN "EXPLORAR TIENDA" — Micro-interacción aguja
+      Para desactivar: comentar este bloque completo
+   ========================================================== */
+#btn-explore {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+/* Barra deslizante tipo aguja que entra desde la izquierda */
+#btn-explore::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    transition: left 0.45s ease-out;
+    pointer-events: none;
+}
+
+#btn-explore:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+}
+
+#btn-explore:hover::before {
+    left: 100%;
+}
+
+/* Reduced-motion: sin scale ni deslizamiento */
+@media (prefers-reduced-motion: reduce) {
+    #btn-explore {
+        transition: none;
+    }
+    #btn-explore::before {
+        transition: none;
+    }
+    #btn-explore:hover {
+        transform: none;
+    }
+}
+
+
+/* ==========================================================
+   4. PARTÍCULAS DE POLVO FLOTANTES — Hero
+      Para desactivar: comentar este bloque completo
+   ========================================================== */
+.hero-dust {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-dust__dot {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    opacity: 0;
+    animation: dust-float linear infinite;
+}
+
+/* Posiciones y duraciones individuales (15-25s) */
+.hero-dust__dot:nth-child(1)  { left:  8%; animation-duration: 18s; animation-delay: 0s; }
+.hero-dust__dot:nth-child(2)  { left: 15%; animation-duration: 22s; animation-delay: 2s; }
+.hero-dust__dot:nth-child(3)  { left: 25%; animation-duration: 16s; animation-delay: 4s; }
+.hero-dust__dot:nth-child(4)  { left: 35%; animation-duration: 24s; animation-delay: 1s; }
+.hero-dust__dot:nth-child(5)  { left: 45%; animation-duration: 19s; animation-delay: 3s; }
+.hero-dust__dot:nth-child(6)  { left: 55%; animation-duration: 21s; animation-delay: 5s; }
+.hero-dust__dot:nth-child(7)  { left: 65%; animation-duration: 17s; animation-delay: 2.5s; }
+.hero-dust__dot:nth-child(8)  { left: 75%; animation-duration: 23s; animation-delay: 0.5s; }
+.hero-dust__dot:nth-child(9)  { left: 82%; animation-duration: 20s; animation-delay: 3.5s; }
+.hero-dust__dot:nth-child(10) { left: 90%; animation-duration: 15s; animation-delay: 1.5s; }
+.hero-dust__dot:nth-child(11) { left: 20%; animation-duration: 25s; animation-delay: 4.5s; }
+.hero-dust__dot:nth-child(12) { left: 70%; animation-duration: 16s; animation-delay: 0.8s; }
+
+@keyframes dust-float {
+    0% {
+        bottom: -5%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.2;
+    }
+    90% {
+        opacity: 0.2;
+    }
+    100% {
+        bottom: 105%;
+        opacity: 0;
+    }
+}
+
+/* Reduced-motion: sin flotación, puntos estáticos muy tenues */
+@media (prefers-reduced-motion: reduce) {
+    .hero-dust__dot {
+        animation: none;
+        opacity: 0.1;
+    }
+}

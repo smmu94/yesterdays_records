@@ -41,39 +41,38 @@
                         <input type="number" class="form-control" id="form-stock" min="0" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Imagen</label>
-                        <div class="input-group">
-                            <input type="file" class="form-control" id="form-image" accept="image/*" required>
-                        </div>
-                        <div class="mt-2" id="image-preview-container" class="d-none">
-                            <img id="image-preview" src="" alt="Preview" style="max-width:120px; border-radius:8px; border:1px solid rgba(255,193,7,0.3);">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-6">
                         <label class="form-label">Categoria</label>
                         <select class="form-select" id="form-category" required>
                             <option value="">Seleccionar...</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Genero</label>
                         <select class="form-select" id="form-genre">
                             <option value="">Sin genero</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Imagen</label>
+                        <input type="file" class="form-control" id="form-image" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="mb-4 text-center" id="image-preview-container" style="display:none;">
+                    <img id="image-preview" src="" alt="Preview" style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid rgba(255,193,7,0.3); object-fit:contain;">
                 </div>
 
                 <div id="form-error" class="alert alert-danger d-none"></div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-warning" id="btn-save">
+                    <button type="submit" class="btn btn-warning btn-sm" id="btn-save">
                         <span class="spinner-border spinner-border-sm d-none" id="save-spinner"></span>
                         <i class="bi bi-check-lg" id="save-icon"></i> Guardar
                     </button>
-                    <a href="#/admin/products" class="btn btn-outline-secondary">Cancelar</a>
+                    <a href="#/admin/products" class="btn btn-outline-secondary btn-sm">Cancelar</a>
                 </div>
             </form>
         </div>
