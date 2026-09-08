@@ -19,9 +19,11 @@
             mkdir($dir, 0777, true);
         }
 
+        $original = pathinfo($_FILES["image"]["name"], PATHINFO_FILENAME);
+        $safe = preg_replace('/[^a-zA-Z0-9-_]/', '-', $original);
         $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-        $filename = time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
-        $route = $dir . $filename;
+        $filename = $safe."-".time().".".$ext;
+        $route = $dir.$filename;
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $route)) {
             return "uploads/products/" . $filename;

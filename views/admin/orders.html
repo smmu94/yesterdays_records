@@ -15,12 +15,44 @@
                     <th>Fecha</th>
                     <th>Total</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="admin-orders-body">
-                <tr id="orders-loading"><td colspan="6" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
+                <tr id="orders-loading"><td colspan="5" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></td></tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="modal fade" id="adminOrderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="admin-modal-order-title">Pedido #</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary mb-3" id="admin-modal-order-info"></p>
+                <table class="table table-dark table-hover align-middle mb-3">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Artista</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-modal-order-items">
+                        <tr><td colspan="5" class="text-center py-3"><div class="spinner-border text-warning" role="status"></div></td></tr>
+                    </tbody>
+                </table>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total</strong>
+                    <strong id="admin-modal-order-total"></strong>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
