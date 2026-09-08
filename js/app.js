@@ -6,41 +6,26 @@ var routes = {
     "#/profile": "views/profile.html",
     "#/cart": "views/cart.html",
     "#/checkout": "views/checkout.html",
-    "#/order-success": "views/order-success.html"
+    "#/order-success": "views/order-success.html",
+    "#/admin/products": "views/admin/products.html",
+    "#/admin/orders": "views/admin/orders.html"
 };
 
-var session = { logged_in: false };
-var currentSearch = "";
-var activeCategory = "";
-var activeGenre = "";
+var dynamicRoutes = [
+    { pattern: "#/product/", view: "views/product.html" },
+    { pattern: "#/admin/product/new", view: "views/admin/product-form.html" },
+    { pattern: "#/admin/product/edit", view: "views/admin/product-form.html" }
+];
 
-async function loadView(hash) {
-    var cleanHash = hash.split("?")[0];
-    var view = routes[cleanHash];
-    var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart"];
+var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart"];
 
-    if(cleanHash.startsWith("#/product")){
-        view = "views/product.html";
-    } else if (!routes[cleanHash]) {
-        history.pushState(null, "", "#/home");
-        view = routes["#/home"];
-    } else if (!session.logged_in && !publicRoutes.includes(cleanHash)) {
-        history.pushState(null, "", "#/login");
-        view = routes["#/login"];
-    } else if (cleanHash.startsWith("#/admin") && session.role !== "admin") {
-        history.pushState(null, "", "#/home");
-        view = routes["#/home"];
-    } else if (session.logged_in && (cleanHash === "#/login" || cleanHash === "#/register")) {
-        history.pushState(null, "", "#/home");
-        view = routes["#/home"];
-    }
-
-    var html = await $.get(view);
-    $("#app").html(html);
-    $("#app").scrollTop(0);
-
-    if(cleanHash.startsWith("#/product/")) {
-        var id = cleanHash.split("/")[2];
+var routeHandlers = {
+    "#/home": async function() {
+        await loadFilters();
+        await loadProducts("", "", currentSearch);
+    },
+    "#/product/": async function(hash) {
+        var id = hash.split("/")[2];
         var response = await $.get(`api/product.php?id=${id}`);
         var data = typeof response === "string" ? JSON.parse(response) : response;
 
@@ -56,51 +41,44 @@ async function loadView(hash) {
                 "product-description": "description",
                 "product-price": "price",
             };
-
             $.each(fields, function(elementId, apiKey) {
                 $(`#${elementId}`).text(p[apiKey]);
             });
-
             $("#product-image").attr("src", p.image).attr("alt", p.name);
             $("#product-breadcrumb").text(p.name);
             $(".btn-add-cart").attr("data-id", p.id_product);
-
             $("#product-detail").show();
             $("#product-loading").hide();
         }
-    }
-
-    if (cleanHash === "#/cart") {
+    },
+    "#/cart": async function() {
         await loadCart();
         var params = new URLSearchParams(window.location.hash.split("?")[1]);
         if (params.get("canceled") === "1") {
             showToast("Pago cancelado", "Tu pedido no fue procesado", "warning");
             history.replaceState(null, "", "#/cart");
         }
-    }
-
-    if (cleanHash === "#/checkout") {
+    },
+    "#/checkout": async function() {
         await loadCheckout();
-    }
-
-    if (cleanHash === "#/order-success") {
+    },
+    "#/profile": async function() {
+        await loadProfile();
+    },
+    "#/order-success": async function() {
         var params = new URLSearchParams(window.location.hash.split("?")[1]);
         var orderId = params.get("id");
         if (orderId) {
             $("#order-id").text(orderId);
             $.post("api/checkout.php", { action: "confirm", id_order: orderId });
         }
-    }
-
-    if (cleanHash === "#/login" || cleanHash === "#/register" || cleanHash === "#/verify") {
-        $(".navbar-center, .navbar-right").hide();
-        $(".navbar").addClass("navbar-minimal");
-    } else {
-        $(".navbar-center, .navbar-right").show();
-        $(".navbar").removeClass("navbar-minimal");
-    }
-
-    if (cleanHash === "#/verify") {
+        $("#btn-back-home").on("click", function(e) {
+            e.preventDefault();
+            history.pushState(null, "", "#/home");
+            loadView("#/home");
+        });
+    },
+    "#/verify": async function() {
         var hashParts = window.location.hash.split("?");
         if (hashParts.length > 1) {
             var params = new URLSearchParams(hashParts[1]);
@@ -113,20 +91,100 @@ async function loadView(hash) {
         } else {
             $("#verify-error").show();
         }
+    },
+    "#/admin/products": async function() {
+        await loadAdminProducts();
+    },
+    "#/admin/orders": async function() {
+        await loadAdminOrders();
+    },
+    "#/admin/product/new": async function() {
+        await loadProductForm();
+    },
+    "#/admin/product/edit": async function(hash) {
+        var id = hash.split("/")[4];
+        await loadProductForm(id);
+    }
+};
+
+var session = { logged_in: false };
+var currentSearch = "";
+var activeCategory = "";
+var activeGenre = "";
+
+function resolveRoute(cleanHash) {
+    if (routes[cleanHash]) {
+        return { view: routes[cleanHash], key: cleanHash };
+    }
+    for (var i = 0; i < dynamicRoutes.length; i++) {
+        if (cleanHash.startsWith(dynamicRoutes[i].pattern)) {
+            return { view: dynamicRoutes[i].view, key: dynamicRoutes[i].pattern };
+        }
+    }
+    return null;
+}
+
+function checkPermissions(cleanHash) {
+    if (!session.logged_in && !publicRoutes.includes(cleanHash)) {
+        return { redirect: "#/login" };
+    }
+    if (cleanHash.startsWith("#/admin") && session.role !== "admin") {
+        return { redirect: "#/home" };
+    }
+    if (session.logged_in && (cleanHash === "#/login" || cleanHash === "#/register")) {
+        return { redirect: "#/home" };
+    }
+    return null;
+}
+
+function applyNavbarVisibility(hash) {
+    if (hash === "#/login" || hash === "#/register" || hash === "#/verify") {
+        $(".navbar-center, .navbar-right").hide();
+        $(".navbar").addClass("navbar-minimal");
+    } else {
+        $(".navbar-center, .navbar-right").show();
+        $(".navbar").removeClass("navbar-minimal");
+    }
+}
+
+async function loadView(hash) {
+    var cleanHash = hash.split("?")[0];
+    var route = resolveRoute(cleanHash);
+
+    if (!route) {
+        history.pushState(null, "", "#/home");
+        route = { view: routes["#/home"], key: "#/home" };
+        cleanHash = "#/home";
     }
 
-    $("#btn-explore").on("click", function () {
-        scrollToCatalog();
-    });
+    var perm = checkPermissions(cleanHash);
+    if (perm) {
+        history.pushState(null, "", perm.redirect);
+        route = { view: routes[perm.redirect], key: perm.redirect };
+        cleanHash = perm.redirect;
+    }
 
-    if (view === "views/home.html") {
-        await loadFilters();
-        await loadProducts("", "", currentSearch);
-    } else {
+    var html = await $.get(route.view);
+    $("#app").html(html);
+    $("#app").scrollTop(0);
+
+    if (routeHandlers[route.key]) {
+        await routeHandlers[route.key](cleanHash);
+    }
+
+    applyNavbarVisibility(cleanHash);
+
+    if (route.view !== "views/home.html") {
         currentSearch = "";
         $("#search-input").val("");
         $("#clear-search").hide();
     }
+
+    $("#btn-explore").on("click", function() {
+        scrollToCatalog();
+    });
+
+    reinitEffects();
 }
 
 function updateNavbar() {
@@ -153,7 +211,7 @@ async function refreshSession() {
 }
 
 function registerNavEvents() {
-    $("body").on("click", ".nav-link", function (event) {
+    $("body").on("click", ".nav-link", function(event) {
         var href = $(this).attr("href");
         if (href && href.startsWith("#")) {
             event.preventDefault();
@@ -182,9 +240,12 @@ async function init() {
     registerCartEvents();
     updateCartCount();
     registerCheckoutEvents();
+    registerProfileEvents();
+    registerAdminProductEvents();
+    registerAdminOrderEvents();
 }
 
-$(window).on("popstate", function () {
+$(window).on("popstate", function() {
     loadView(window.location.hash || "#/home");
 });
 
