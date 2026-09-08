@@ -3,7 +3,7 @@
     include(__DIR__."/../config/helpers.php");
     include(__DIR__."/../config/keys.php");
     include(__DIR__."/../vendor/autoload.php");
-    session_start();
+    @session_start();
 
     $action = $_GET["action"] ?? $_POST["action"] ?? "";
 
@@ -15,9 +15,10 @@
 
     if ($action === "confirm") {
         $id_order = intval($_POST["id_order"] ?? 0);
-        $con->query("UPDATE orders SET status = 'paid', paid_date = NOW() 
+        $con->query("UPDATE orders SET status = 'paid' 
                      WHERE id_order = $id_order AND id_user = $id_user");
         success();
+        exit;
     }
 
     $res = $con->query("SELECT c.id_product, c.quantity, p.name, p.price, p.stock

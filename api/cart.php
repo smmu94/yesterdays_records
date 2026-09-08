@@ -1,7 +1,7 @@
 <?php
     include(__DIR__."/../config/database.php");
     include(__DIR__."/../config/helpers.php");
-    session_start();
+    @session_start();
 
     $action = $_GET["action"] ?? $_POST["action"] ?? "";
     $logged_in = is_logged_in();
@@ -69,14 +69,17 @@
             } else {
                 $con->query("INSERT INTO cart (id_user, id_product, quantity) VALUES ($id_user, $id_product, 1)");
             }
+            $res = $con->query("SELECT COALESCE(SUM(quantity), 0) AS total FROM cart WHERE id_user = $id_user");
+            $count = $res->fetch_assoc()["total"];
         } else {
             if (!isset($_SESSION["cart"])) {
                 $_SESSION["cart"] = [$id_product => 1];
             } else {
                 $_SESSION["cart"][$id_product]++;
             }
+            $count = array_sum($_SESSION["cart"]);
         }
-        success();
+        success(["count" => $count]);
     }
 
     if ($action === "update") {
@@ -93,13 +96,19 @@
                 $_SESSION["cart"][$id_product] = $quantity;
             }
         }
-        success();
+        $count = $logged_in
+            ? $con->query("SELECT COALESCE(SUM(quantity), 0) AS total FROM cart WHERE id_user = " . get_user_id())->fetch_assoc()["total"]
+            : array_sum($_SESSION["cart"] ?? []);
+        success(["count" => $count]);
     }
 
     if ($action === "remove") {
         $id_product = intval($_POST["id_product"] ?? 0);
         delete($id_product);
-        success();
+        $count = $logged_in
+            ? $con->query("SELECT COALESCE(SUM(quantity), 0) AS total FROM cart WHERE id_user = " . get_user_id())->fetch_assoc()["total"]
+            : array_sum($_SESSION["cart"] ?? []);
+        success(["count" => $count]);
     }
 
     error("Accion no valida");

@@ -10,7 +10,7 @@
             LEFT JOIN genres g ON p.id_genre = g.id_genre");
 
         $con->query("CREATE OR REPLACE VIEW v_orders AS
-            SELECT o.id_order, o.total, o.status, o.date, o.paid_date,
+            SELECT o.id_order, o.total, o.status, o.date,
                    u.id_user, u.name AS client_name, u.email,
                    a.street_address, a.cp,
                    ci.name AS city_name
@@ -25,4 +25,3 @@
             FROM order_detail od
             INNER JOIN products p ON od.id_product = p.id_product");
     }
-?>

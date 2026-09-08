@@ -74,7 +74,16 @@ function registerCartEvents() {
                 showToast("Error", data.error, "danger");
             } else {
                 showToast("Agregado", "Producto agregado al carrito", "success");
-                updateCartCount();
+                if (data.count !== undefined) {
+                    $("#cart-count").text(data.count);
+                    if (data.count > 0) {
+                        $("#cart-count").show();
+                    } else {
+                        $("#cart-count").hide();
+                    }
+                } else {
+                    updateCartCount();
+                }
             }
         });
     });
@@ -82,26 +91,44 @@ function registerCartEvents() {
     $("body").on("click", ".btn-cart-plus", function() {
         var id = $(this).data("id");
         var qty = $(this).data("qty") + 1;
-        $.post("api/cart.php", { action: "update", id_product: id, quantity: qty }, function() {
+        $.post("api/cart.php", { action: "update", id_product: id, quantity: qty }, function(response) {
+            var data = typeof response === "string" ? JSON.parse(response) : response;
             loadCart();
-            updateCartCount();
+            if (data.count !== undefined) {
+                $("#cart-count").text(data.count);
+                data.count > 0 ? $("#cart-count").show() : $("#cart-count").hide();
+            } else {
+                updateCartCount();
+            }
         });
     });
 
     $("body").on("click", ".btn-cart-minus", function() {
         var id = $(this).data("id");
         var qty = $(this).data("qty") - 1;
-        $.post("api/cart.php", { action: "update", id_product: id, quantity: qty }, function() {
+        $.post("api/cart.php", { action: "update", id_product: id, quantity: qty }, function(response) {
+            var data = typeof response === "string" ? JSON.parse(response) : response;
             loadCart();
-            updateCartCount();
+            if (data.count !== undefined) {
+                $("#cart-count").text(data.count);
+                data.count > 0 ? $("#cart-count").show() : $("#cart-count").hide();
+            } else {
+                updateCartCount();
+            }
         });
     });
 
     $("body").on("click", ".btn-cart-remove", function() {
         var id = $(this).data("id");
-        $.post("api/cart.php", { action: "remove", id_product: id }, function() {
+        $.post("api/cart.php", { action: "remove", id_product: id }, function(response) {
+            var data = typeof response === "string" ? JSON.parse(response) : response;
             loadCart();
-            updateCartCount();
+            if (data.count !== undefined) {
+                $("#cart-count").text(data.count);
+                data.count > 0 ? $("#cart-count").show() : $("#cart-count").hide();
+            } else {
+                updateCartCount();
+            }
         });
     });
 

@@ -1,7 +1,7 @@
 <?php
     include(__DIR__."/../config/database.php");
     include(__DIR__."/../config/helpers.php");
-    session_start();
+    @session_start();
 
     $action = $_GET["action"] ?? $_POST["action"] ?? "";
 

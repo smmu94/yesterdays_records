@@ -4,4 +4,3 @@
 
     include(__DIR__."/views.php");
     createViews($con);
-?>

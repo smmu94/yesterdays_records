@@ -1,6 +1,7 @@
 async function loadCheckout() {
     var response = await $.get("api/cart.php?action=get");
-    var items = typeof response === "string" ? JSON.parse(response) : response;
+    var data = typeof response === "string" ? JSON.parse(response) : response;
+    var items = data.items || [];
 
     if (items.length === 0) {
         $("#checkout-loading").hide();
@@ -33,7 +34,8 @@ async function loadCheckout() {
     $("#checkout-total").text(total.toFixed(2));
 
     var citiesResponse = await $.get("api/cities.php");
-    var cities = typeof citiesResponse === "string" ? JSON.parse(citiesResponse) : citiesResponse;
+    var citiesData = typeof citiesResponse === "string" ? JSON.parse(citiesResponse) : citiesResponse;
+    var cities = citiesData.cities || [];
     var citySelect = $("#checkout-city");
     citySelect.find("option:gt(0)").remove();
     cities.forEach(function(city) {
@@ -41,7 +43,8 @@ async function loadCheckout() {
     });
 
     var addrResponse = await $.get("api/addresses.php");
-    var addresses = typeof addrResponse === "string" ? JSON.parse(addrResponse) : addrResponse;
+    var addrData = typeof addrResponse === "string" ? JSON.parse(addrResponse) : addrResponse;
+    var addresses = addrData.addresses || [];
     var containerAddr = $("#saved-addresses");
     containerAddr.empty();
 
@@ -115,7 +118,7 @@ function registerCheckoutEvents() {
             data.id_address = $("input[name='address']:checked").val();
         }
 
-        btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
+        btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
 
         $.post("api/checkout.php", data, function(response) {
             var result = typeof response === "string" ? JSON.parse(response) : response;

@@ -2,7 +2,7 @@ $(document).on("submit", "#register-form", async function (event) {
     event.preventDefault();
 
     var btn = $(this).find("button[type='submit']");
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Registrando...');
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
 
     var name = $("#register-name").val();
     var email = $("#register-email").val();
@@ -24,7 +24,7 @@ $(document).on("submit", "#login-form", async function (event) {
     event.preventDefault();
 
     var btn = $(this).find("button[type='submit']");
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Iniciando...');
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
 
     var email = $("#login-email").val();
     var password = $("#login-password").val();
