@@ -12,19 +12,25 @@
         $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
         $role = $_POST["role"] ?? "client";
 
-        $res = $con->query("SELECT id_user FROM users WHERE email = '$email'");
-        if ($res->num_rows > 0) {
+        $stmt = $con->prepare("SELECT id_user FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows > 0) {
+            $stmt->close();
             error("Este email ya esta registrado");
         }
+        $stmt->close();
 
         $token = bin2hex(random_bytes(32));
         $token_hash = hash("sha256", $token);
         $token_expire = date("Y-m-d H:i:s", strtotime("+24 hours"));
 
-        $sql = "INSERT INTO users (name, email, password, role, token, token_expire, status, date) 
-                VALUES ('$name', '$email', '$password', '$role', '$token_hash', '$token_expire', 'pending', NOW())";
+        $stmt = $con->prepare("INSERT INTO users (name, email, password, role, token, token_expire, status, date) 
+                              VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
+        $stmt->bind_param("ssssss", $name, $email, $password, $role, $token_hash, $token_expire);
 
-        if ($con->query($sql)) {
+        if ($stmt->execute()) {
+            $stmt->close();
             $para = $email;
             $asunto = "Activa tu cuenta en Yesterdays Records";
             $mensaje = "
@@ -45,6 +51,7 @@
             mail($para, $asunto, $mensaje, $cabeceras);
             success(["message" => "Revisa tu correo para activarla."]);
         } else {
+            $stmt->close();
             error("Error al registrar el usuario");
         }
     }
@@ -54,18 +61,28 @@
         $token = $_GET["tok"];
         $token_hash = hash("sha256", $token);
 
-        $res = $con->query("SELECT * FROM users WHERE token = '$token_hash' AND token_expire >= NOW()");
+        $stmt = $con->prepare("SELECT id_user FROM users WHERE token = ? AND token_expire >= NOW()");
+        $stmt->bind_param("s", $token_hash);
+        $stmt->execute();
+        $res = $stmt->get_result();
 
         if ($row = $res->fetch_assoc()) {
             $id = $row["id_user"];
-            if ($con->query("UPDATE users SET status = 'verified', token = NULL, token_expire = NULL WHERE id_user = $id")) {
+            $stmt->close();
+
+            $stmt2 = $con->prepare("UPDATE users SET status = 'verified', token = NULL, token_expire = NULL WHERE id_user = ?");
+            $stmt2->bind_param("i", $id);
+            if ($stmt2->execute()) {
+                $stmt2->close();
                 header("location:../index.html#/verify?status=ok");
                 die();
             } else {
+                $stmt2->close();
                 header("location:../index.html#/verify?status=error");
                 die();
             }
         } else {
+            $stmt->close();
             header("location:../index.html#/verify?status=error");
             die();
         }
@@ -76,7 +93,11 @@
         $email = $_POST["email"];
         $password_form = $_POST["password"];
 
-        $res = $con->query("SELECT * FROM users WHERE email = '$email'");
+        $stmt = $con->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
         if ($row = $res->fetch_assoc()) {
             if (password_verify($password_form, $row["password"])) {
                 if ($row["status"] == "verified") {
@@ -90,28 +111,45 @@
                     $session_cart = $_SESSION["cart"] ?? [];
                     if (!empty($session_cart)) {
                         foreach ($session_cart as $id_product => $qty) {
-                            $res_cart = $con->query("SELECT id_cart, quantity FROM cart 
-                                                    WHERE id_user = {$row['id_user']} AND id_product = $id_product");
+                            $stmt_cart = $con->prepare("SELECT id_cart, quantity FROM cart 
+                                                       WHERE id_user = ? AND id_product = ?");
+                            $stmt_cart->bind_param("ii", $row['id_user'], $id_product);
+                            $stmt_cart->execute();
+                            $res_cart = $stmt_cart->get_result();
+
                             if ($res_cart && $res_cart->num_rows > 0) {
                                 $row_cart = $res_cart->fetch_assoc();
                                 $new_qty = $row_cart["quantity"] + $qty;
-                                $con->query("UPDATE cart SET quantity = $new_qty WHERE id_cart = {$row_cart['id_cart']}");
+                                $stmt_cart->close();
+
+                                $stmt_up = $con->prepare("UPDATE cart SET quantity = ? WHERE id_cart = ?");
+                                $stmt_up->bind_param("ii", $new_qty, $row_cart['id_cart']);
+                                $stmt_up->execute();
+                                $stmt_up->close();
                             } else {
-                                $con->query("INSERT INTO cart (id_user, id_product, quantity) 
-                                             VALUES ({$row['id_user']}, $id_product, $qty)");
+                                $stmt_cart->close();
+
+                                $stmt_ins = $con->prepare("INSERT INTO cart (id_user, id_product, quantity) VALUES (?, ?, ?)");
+                                $stmt_ins->bind_param("iii", $row['id_user'], $id_product, $qty);
+                                $stmt_ins->execute();
+                                $stmt_ins->close();
                             }
                         }
                         unset($_SESSION["cart"]);
                     }
 
+                    $stmt->close();
                     success(["message" => "Usuario logueado con exito"]);
                 } else {
+                    $stmt->close();
                     error("Debes activar tu cuenta!");
                 }
             } else {
+                $stmt->close();
                 error("Contrasena invalida");
             }
         } else {
+            $stmt->close();
             error("Usuario no registrado");
         }
     }

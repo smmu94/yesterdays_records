@@ -31,6 +31,7 @@ var routeHandlers = {
 
         if (data.ok === false) {
             $("#product-loading").hide();
+            showEl("#product-error");
             $("#product-error h3").text(data.error);
         } else if (data.product) {
             var p = data.product;
@@ -47,7 +48,8 @@ var routeHandlers = {
             $("#product-image").attr("src", p.image).attr("alt", p.name);
             $("#product-breadcrumb").text(p.name);
             $(".btn-add-cart").attr("data-id", p.id_product);
-            $("#product-detail").show();
+            $("#qty-value").text(1);
+            showEl("#product-detail");
             $("#product-loading").hide();
         }
     },
@@ -84,12 +86,12 @@ var routeHandlers = {
             var params = new URLSearchParams(hashParts[1]);
             var status = params.get("status");
             if (status === "ok") {
-                $("#verify-success").show();
+                showEl("#verify-success");
             } else {
-                $("#verify-error").show();
+                showEl("#verify-error");
             }
         } else {
-            $("#verify-error").show();
+            showEl("#verify-error");
         }
     },
     "#/admin/products": async function() {
@@ -139,10 +141,10 @@ function checkPermissions(cleanHash) {
 
 function applyNavbarVisibility(hash) {
     if (hash === "#/login" || hash === "#/register" || hash === "#/verify") {
-        $(".navbar-center, .navbar-right").hide();
+        $(".navbar-nav, .search-bar, .search-icon-mobile, .navbar-user-area").hide();
         $(".navbar").addClass("navbar-minimal");
     } else {
-        $(".navbar-center, .navbar-right").show();
+        $(".navbar-nav, .search-bar, .search-icon-mobile, .navbar-user-area").show();
         $(".navbar").removeClass("navbar-minimal");
     }
 }
@@ -173,11 +175,12 @@ async function loadView(hash) {
     }
 
     applyNavbarVisibility(cleanHash);
+    updateActiveNavLink(cleanHash);
 
     if (route.view !== "views/home.html") {
         currentSearch = "";
         $("#search-input").val("");
-        $("#clear-search").hide();
+        hideEl("#clear-search");
     }
 
     $("#btn-explore").on("click", function() {
@@ -190,17 +193,23 @@ async function loadView(hash) {
 function updateNavbar() {
     if (session.logged_in) {
         $(".auth-only").hide();
-        $(".user-only").show();
+        showEl(".user-only");
         if (session.role === "admin") {
-            $(".admin-only").show();
+            showEl(".admin-only");
+            showEl(".admin-only-nav");
+            hideEl(".client-only");
+            $("#user-display").text(session.name);
+        } else {
+            showEl(".client-only");
+            hideEl(".admin-only-nav");
+            $("#user-display").text(session.name);
         }
-        $("#user-display").text(
-            `${session.role === "admin" ? session.name + " (Admin)" : session.name}`
-        );
     } else {
         $(".auth-only").show();
-        $(".user-only").hide();
-        $(".admin-only").hide();
+        hideEl(".user-only");
+        hideEl(".admin-only");
+        hideEl(".client-only");
+        hideEl(".admin-only-nav");
     }
 }
 
@@ -217,6 +226,30 @@ function registerNavEvents() {
             event.preventDefault();
             history.pushState(null, "", href);
             loadView(href);
+        }
+    });
+
+    $("body").on("click", "#search-toggle", function() {
+        $(".search-bar").toggleClass("search-active");
+        if ($(".search-bar").hasClass("search-active")) {
+            $("#search-input").focus();
+        }
+    });
+
+    $("body").on("click", function(e) {
+        if (!$(e.target).closest(".search-bar, #search-toggle").length) {
+            $(".search-bar").removeClass("search-active");
+        }
+    });
+}
+
+function updateActiveNavLink(hash) {
+    $(".navbar-nav .nav-link").removeClass("active");
+    var cleanHash = hash.split("?")[0];
+    $(".navbar-nav .nav-link").each(function() {
+        var href = $(this).attr("href");
+        if (href === cleanHash) {
+            $(this).addClass("active");
         }
     });
 }
@@ -251,6 +284,16 @@ async function init() {
         if (!page || page < 1) return;
         if (prefix === "admin-products") loadAdminProducts(page);
         if (prefix === "admin-orders") loadAdminOrders(page);
+    });
+
+    $("body").on("click", "#qty-minus", function() {
+        var val = parseInt($("#qty-value").text()) || 1;
+        if (val > 1) $("#qty-value").text(val - 1);
+    });
+
+    $("body").on("click", "#qty-plus", function() {
+        var val = parseInt($("#qty-value").text()) || 1;
+        if (val < 99) $("#qty-value").text(val + 1);
     });
 }
 

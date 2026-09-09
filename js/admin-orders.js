@@ -33,7 +33,7 @@ async function loadAdminOrders(page) {
                 <td>${o.id_order}</td>
                 <td>${o.client_name}</td>
                 <td>${o.email}</td>
-                <td>${o.date}</td>
+                <td>${formatDate(o.date)}</td>
                 <td>${o.total} €</td>
                 <td><span class="badge ${statusClass}">${statusLabel}</span></td>
             </tr>
@@ -57,7 +57,7 @@ function registerAdminOrderEvents() {
         if (order.status === "pending") { statusClass = "bg-warning text-dark"; statusLabel = "Pendiente"; }
 
         $("#admin-modal-order-title").html("Pedido #" + order.id_order + ' <span class="badge ' + statusClass + '">' + statusLabel + "</span>");
-        $("#admin-modal-order-info").text(order.date + " — " + order.client_name);
+        $("#admin-modal-order-info").text(formatDate(order.date) + " — " + order.client_name);
 
         var tbody = $("#admin-modal-order-items");
         tbody.html('<tr><td colspan="5" class="text-center py-3"><div class="spinner-border text-warning" role="status"></div></td></tr>');

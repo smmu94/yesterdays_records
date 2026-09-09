@@ -2,7 +2,7 @@
     function createViews($con) {
         $con->query("CREATE OR REPLACE VIEW v_products AS
             SELECT p.id_product, p.name, p.description, p.artist, p.price,
-                   p.stock, p.image, p.date,
+                   p.stock, COALESCE(NULLIF(p.image, ''), 'assets/default.webp') AS image, p.date,
                    c.id_category, c.name AS category_name,
                    g.id_genre, g.name AS genre_name
             FROM products p
@@ -21,7 +21,7 @@
 
         $con->query("CREATE OR REPLACE VIEW v_order_detail AS
             SELECT od.id_detail, od.id_order, od.quantity, od.unit_price,
-                   p.name AS product_name, p.artist, p.image
+                   p.name AS product_name, p.artist, COALESCE(NULLIF(p.image, ''), 'assets/default.webp') AS image
             FROM order_detail od
             INNER JOIN products p ON od.id_product = p.id_product");
     }

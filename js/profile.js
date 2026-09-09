@@ -16,7 +16,7 @@ async function loadProfile(page) {
 
     if (data.orders.length === 0 && profilePage === 1) {
         $("#profile-loading").hide();
-        $("#profile-empty").show();
+        showEl("#profile-empty");
         return;
     }
 
@@ -30,7 +30,7 @@ async function loadProfile(page) {
         var row = `
             <tr class="order-row" data-id="${order.id_order}" style="cursor:pointer;">
                 <td>${order.id_order}</td>
-                <td>${order.date}</td>
+                <td>${formatDate(order.date)}</td>
                 <td>${order.total} €</td>
                 <td><span class="badge ${statusClass}">${statusLabel}</span></td>
             </tr>
@@ -40,7 +40,7 @@ async function loadProfile(page) {
 
     renderAdminPagination("profile-orders", data.pages, data.page);
     $("#profile-loading").hide();
-    $("#profile-content").show();
+    showEl("#profile-content");
 }
 
 function registerProfileEvents() {
@@ -56,7 +56,7 @@ function registerProfileEvents() {
         if (order.status === "pending") { statusClass = "bg-warning text-dark"; statusLabel = "Pendiente"; }
 
         $("#modal-order-title").html("Pedido #" + order.id_order + ' <span class="badge ' + statusClass + '">' + statusLabel + "</span>");
-        $("#modal-order-date").text(order.date + " — " + order.street_address + ", " + order.city_name + " (" + order.cp + ")");
+        $("#modal-order-date").text(formatDate(order.date) + " — " + order.street_address + ", " + order.city_name + " (" + order.cp + ")");
         $("#modal-order-total").text(order.total + " €");
 
         var tbody = $("#modal-order-items");

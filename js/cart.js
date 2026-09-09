@@ -1,12 +1,18 @@
 async function loadCart() {
-    var response = await $.get("api/cart.php?action=get");
-    var data = typeof response === "string" ? JSON.parse(response) : response;
-    var items = data.items || [];
+    try {
+        var response = await $.get("api/cart.php?action=get");
+        var data = typeof response === "string" ? JSON.parse(response) : response;
+        var items = data.items || [];
+    } catch (e) {
+        $("#cart-loading").hide();
+        showEl("#cart-empty");
+        return;
+    }
 
     if (items.length === 0) {
         $("#cart-loading").hide();
-        $("#cart-content").hide();
-        $("#cart-empty").show();
+        hideEl("#cart-content");
+        showEl("#cart-empty");
         return;
     }
 
@@ -15,30 +21,31 @@ async function loadCart() {
     var total = 0;
 
     items.forEach(function(item) {
-        var subtotal = item.price * item.quantity;
+        var price = parseFloat(item.price);
+        var subtotal = price * item.quantity;
         total += subtotal;
 
         var row = `
             <tr>
                 <td>
                     <div class="d-flex align-items-center gap-3">
-                        <img src="${item.image}" alt="${item.product_name}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+                        <img src="${item.image}" alt="${item.product_name}" class="cart-thumb">
                         <div>
                             <p class="mb-0 fw-bold">${item.product_name}</p>
                             <small class="text-secondary">${item.artist}</small>
                         </div>
                     </div>
                 </td>
-                <td>${item.price} €</td>
+                <td class="text-end">${price.toFixed(2)} €</td>
                 <td>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
                         <button class="btn btn-sm btn-warning btn-cart-minus" data-id="${item.id_product}" data-qty="${item.quantity}">-</button>
                         <span>${item.quantity}</span>
                         <button class="btn btn-sm btn-warning btn-cart-plus" data-id="${item.id_product}" data-qty="${item.quantity}">+</button>
                     </div>
                 </td>
-                <td class="fw-bold">${subtotal.toFixed(2)} €</td>
-                <td>
+                <td class="text-end fw-bold">${subtotal.toFixed(2)} €</td>
+                <td class="text-center">
                     <button class="btn btn-sm btn-danger btn-cart-remove" data-id="${item.id_product}">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -48,9 +55,9 @@ async function loadCart() {
         tbody.append(row);
     });
 
-    $("#cart-total").text(total.toFixed(2));
+    $("#cart-total").text(total.toFixed(2) + " €");
     $("#cart-loading").hide();
-    $("#cart-content").show();
+    showEl("#cart-content");
 }
 
 function updateCartCount() {
@@ -68,7 +75,8 @@ function updateCartCount() {
 function registerCartEvents() {
     $("body").on("click", ".btn-add-cart", function() {
         var id = $(this).data("id");
-        $.post("api/cart.php", { action: "add", id_product: id }, function(response) {
+        var qty = parseInt($("#qty-value").text()) || 1;
+        $.post("api/cart.php", { action: "add", id_product: id, quantity: qty }, function(response) {
             var data = typeof response === "string" ? JSON.parse(response) : response;
             if (data.ok === false) {
                 showToast("Error", data.error, "danger");

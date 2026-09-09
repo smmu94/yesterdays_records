@@ -5,7 +5,7 @@ async function loadCheckout() {
 
     if (items.length === 0) {
         $("#checkout-loading").hide();
-        $("#checkout-empty").show();
+        showEl("#checkout-empty");
         return;
     }
 
@@ -28,7 +28,7 @@ async function loadCheckout() {
     });
 
     container.append(`<hr><div class="d-flex justify-content-between">
-        <strong style="color:#333;">Total</strong><strong style="color:#222;">${total.toFixed(2)} €</strong>
+        <strong>Total</strong><strong>${total.toFixed(2)} €</strong>
     </div>`);
 
     $("#checkout-total").text(total.toFixed(2));
@@ -75,14 +75,14 @@ async function loadCheckout() {
     containerAddr.show();
 
     $("#checkout-loading").hide();
-    $("#checkout-content").show();
+    showEl("#checkout-content");
 }
 
 function toggleNewAddress() {
     if ($("#addr-new").is(":checked")) {
-        $("#new-address-form").show();
+        showEl("#new-address-form");
     } else {
-        $("#new-address-form").hide();
+        hideEl("#new-address-form");
     }
 }
 
@@ -93,7 +93,7 @@ function registerCheckoutEvents() {
 
     $("body").on("click", "#btn-pay", function() {
         var isNew = $("#addr-new").is(":checked");
-        $("#checkout-error").hide();
+        hideEl("#checkout-error");
 
         if (isNew) {
             var street = $("#checkout-street").val().trim();
@@ -101,7 +101,8 @@ function registerCheckoutEvents() {
             var cp = $("#checkout-cp").val().trim();
 
             if (!street || !city || !cp) {
-                $("#checkout-error").text("Completa todos los campos de dirección").show();
+                $("#checkout-error").text("Completa todos los campos de dirección");
+                showEl("#checkout-error");
                 return;
             }
         }

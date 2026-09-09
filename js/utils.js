@@ -1,3 +1,13 @@
+function showEl(sel) { $(sel).removeClass("d-none").removeAttr("hidden"); }
+function hideEl(sel) { $(sel).addClass("d-none").attr("hidden", ""); }
+
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    var parts = dateStr.split("-");
+    if (parts.length !== 3) return dateStr;
+    return parts[2] + "/" + parts[1] + "/" + parts[0];
+}
+
 function showToast(titulo, mensaje, tipo) {
     var toast = $("#app-toast");
     var header = toast.find(".toast-header");

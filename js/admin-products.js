@@ -33,7 +33,7 @@ async function loadAdminProducts(page) {
     products.forEach(function(p) {
         var row = `
             <tr>
-                <td><img src="${p.image}" alt="${p.name}" style="width:50px; height:50px; object-fit:cover; border-radius:6px;"></td>
+                <td><img src="${p.image}" alt="${p.name}" class="table-thumb"></td>
                 <td>${p.name}</td>
                 <td>${p.artist}</td>
                 <td>${p.category_name}</td>
@@ -72,6 +72,7 @@ async function loadProductForm(id) {
 
     if (id) {
         $("#form-title").text("Editar Producto");
+        $("#form-heading").text("Editar Producto");
         var response = await $.get("api/admin.php", { action: "get_product", id: id });
         var data = typeof response === "string" ? JSON.parse(response) : response;
 
@@ -92,7 +93,6 @@ async function loadProductForm(id) {
 
         if (p.image) {
             $("#image-preview").attr("src", p.image);
-            $("#image-preview-container").show();
         }
     }
 
@@ -103,11 +103,6 @@ async function loadProductForm(id) {
 function saveProduct() {
     var id = $("#form-id").val();
     var fileInput = $("#form-image")[0].files[0];
-
-    if (!id && !fileInput) {
-        $("#form-error").text("Debes seleccionar una imagen").removeClass("d-none");
-        return;
-    }
 
     var formData = new FormData();
     formData.append("name", $("#form-name").val());
@@ -201,13 +196,17 @@ function registerAdminProductEvents() {
         saveProduct();
     });
 
+    $("body").on("click", "#btn-select-image", function(e) {
+        e.preventDefault();
+        document.getElementById("form-image").click();
+    });
+
     $("body").on("change", "#form-image", function() {
         var file = this.files[0];
         if (file) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 $("#image-preview").attr("src", e.target.result);
-                $("#image-preview-container").show();
             };
             reader.readAsDataURL(file);
         }

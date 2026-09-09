@@ -8,36 +8,56 @@
 
     $sql = "SELECT * FROM v_products";
     $countSql = "SELECT COUNT(*) AS total FROM v_products";
-
     $condition = "";
+    $types = "";
+    $params = [];
 
     if (isset($_GET["category"]) && $_GET["category"] != "") {
-        $condition .= " AND id_category = " . intval($_GET["category"]);
+        $condition .= " AND id_category = ?";
+        $types .= "i";
+        $params[] = intval($_GET["category"]);
     }
 
     if (isset($_GET["genre"]) && $_GET["genre"] != "") {
-        $condition .= " AND id_genre = " . intval($_GET["genre"]);
+        $condition .= " AND id_genre = ?";
+        $types .= "i";
+        $params[] = intval($_GET["genre"]);
     }
 
     if (isset($_GET["search"]) && $_GET["search"] != "") {
-        $search = $con->real_escape_string($_GET["search"]);
-        $condition .= " AND (name LIKE '%$search%' OR artist LIKE '%$search%')";
+        $search = "%" . $_GET["search"] . "%";
+        $condition .= " AND (name LIKE ? OR artist LIKE ?)";
+        $types .= "ss";
+        $params[] = $search;
+        $params[] = $search;
     }
 
     if ($condition != "") {
-        $where = " WHERE " . substr($condition, 5);
+        $where = " WHERE " . substr($condition, 4);
         $sql .= $where;
         $countSql .= $where;
     }
 
-    $totalRes = $con->query($countSql);
-    $total = $totalRes->fetch_assoc()["total"];
+    $stmt = $con->prepare($countSql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $total = $stmt->get_result()->fetch_assoc()["total"];
+    $stmt->close();
 
     $sql .= " ORDER BY name LIMIT $limit OFFSET $offset";
-    $res = $con->query($sql);
+    $stmt = $con->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $products = $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    $stmt->close();
 
     success([
-        "products" => $res->num_rows > 0 ? $res->fetch_all(MYSQLI_ASSOC) : [],
+        "products" => $products,
         "total" => intval($total),
         "page" => $page,
         "pages" => ceil($total / $limit)

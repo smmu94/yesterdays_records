@@ -1,7 +1,7 @@
 <?php
     include(__DIR__."/../config/database.php");
     include(__DIR__."/../config/helpers.php");
-    session_start();
+    @session_start();
 
     $action = $_GET["action"] ?? $_POST["action"] ?? "";
 
@@ -40,28 +40,48 @@
         $sql = "SELECT * FROM v_products";
         $countSql = "SELECT COUNT(*) AS total FROM v_products";
         $condition = "";
+        $types = "";
+        $params = [];
 
         if (isset($_GET["category"]) && $_GET["category"] != "") {
-            $condition .= " AND id_category = " . intval($_GET["category"]);
+            $condition .= " AND id_category = ?";
+            $types .= "i";
+            $params[] = intval($_GET["category"]);
         }
         if (isset($_GET["search"]) && $_GET["search"] != "") {
-            $search = $con->real_escape_string($_GET["search"]);
-            $condition .= " AND (name LIKE '%$search%' OR artist LIKE '%$search%')";
+            $search = "%" . $_GET["search"] . "%";
+            $condition .= " AND (name LIKE ? OR artist LIKE ?)";
+            $types .= "ss";
+            $params[] = $search;
+            $params[] = $search;
         }
 
         if ($condition != "") {
-            $where = " WHERE " . substr($condition, 5);
+            $where = " WHERE " . substr($condition, 4);
             $sql .= $where;
             $countSql .= $where;
         }
 
-        $totalRes = $con->query($countSql);
-        $total = $totalRes->fetch_assoc()["total"];
+        $stmt = $con->prepare($countSql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $total = $stmt->get_result()->fetch_assoc()["total"];
+        $stmt->close();
 
         $sql .= " ORDER BY name LIMIT $limit OFFSET $offset";
-        $res = $con->query($sql);
+        $stmt = $con->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        $stmt->close();
+
         success([
-            "products" => $res->num_rows > 0 ? $res->fetch_all(MYSQLI_ASSOC) : [],
+            "products" => $products,
             "total" => intval($total),
             "page" => $page,
             "pages" => ceil($total / $limit)
@@ -69,60 +89,74 @@
     }
 
     if ($action === "create_product") {
-        $name = $con->real_escape_string($_POST["name"]);
-        $artist = $con->real_escape_string($_POST["artist"]);
-        $description = $con->real_escape_string($_POST["description"]);
-        $price = floatval($_POST["price"]);
-        $stock = intval($_POST["stock"]);
-        $id_category = intval($_POST["id_category"]);
-        $id_genre = intval($_POST["id_genre"]);
+        $name = $_POST["name"] ?? "";
+        $artist = $_POST["artist"] ?? "";
+        $description = $_POST["description"] ?? "";
+        $price = floatval($_POST["price"] ?? 0);
+        $stock = intval($_POST["stock"] ?? 0);
+        $id_category = intval($_POST["id_category"] ?? 0);
+        $id_genre = intval($_POST["id_genre"] ?? 0);
 
         $image = handle_image_upload();
         if ($image === null) {
-            error("Error al subir la imagen");
+            $image = "assets/default.webp";
         }
 
-        $sql = "INSERT INTO products (name, description, id_category, id_genre, artist, price, stock, image)
-                VALUES ('$name', '$description', $id_category, $id_genre, '$artist', $price, $stock, '$image')";
-        if ($con->query($sql)) {
-            success(["id" => $con->insert_id]);
+        $stmt = $con->prepare("INSERT INTO products (name, description, id_category, id_genre, artist, price, stock, image)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssiisdis", $name, $description, $id_category, $id_genre, $artist, $price, $stock, $image);
+        if ($stmt->execute()) {
+            $id = $con->insert_id;
+            $stmt->close();
+            success(["id" => $id]);
         } else {
+            $stmt->close();
             error("Error al crear producto");
         }
     }
 
     if ($action === "get_product") {
         $id = intval($_GET["id"]);
-        $res = $con->query("SELECT * FROM products WHERE id_product = $id");
+        $stmt = $con->prepare("SELECT * FROM products WHERE id_product = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
         if ($res && $res->num_rows > 0) {
-            success(["product" => $res->fetch_assoc()]);
+            $product = $res->fetch_assoc();
+            $stmt->close();
+            success(["product" => $product]);
         } else {
+            $stmt->close();
             error("Producto no encontrado");
         }
     }
 
     if ($action === "update_product") {
         $id = intval($_POST["id_product"]);
-        $name = $con->real_escape_string($_POST["name"]);
-        $artist = $con->real_escape_string($_POST["artist"]);
-        $description = $con->real_escape_string($_POST["description"]);
-        $price = floatval($_POST["price"]);
-        $stock = intval($_POST["stock"]);
-        $id_category = intval($_POST["id_category"]);
-        $id_genre = intval($_POST["id_genre"]);
+        $name = $_POST["name"] ?? "";
+        $artist = $_POST["artist"] ?? "";
+        $description = $_POST["description"] ?? "";
+        $price = floatval($_POST["price"] ?? 0);
+        $stock = intval($_POST["stock"] ?? 0);
+        $id_category = intval($_POST["id_category"] ?? 0);
+        $id_genre = intval($_POST["id_genre"] ?? 0);
 
         $image = handle_image_upload();
         if ($image !== null) {
-            $con->query("UPDATE products SET image='$image' WHERE id_product=$id");
+            $stmt_img = $con->prepare("UPDATE products SET image = ? WHERE id_product = ?");
+            $stmt_img->bind_param("si", $image, $id);
+            $stmt_img->execute();
+            $stmt_img->close();
         }
 
-        $sql = "UPDATE products SET name='$name', description='$description',
-                id_category=$id_category, id_genre=$id_genre, artist='$artist',
-                price=$price, stock=$stock
-                WHERE id_product=$id";
-        if ($con->query($sql)) {
+        $stmt = $con->prepare("UPDATE products SET name = ?, description = ?, id_category = ?, id_genre = ?,
+                              artist = ?, price = ?, stock = ? WHERE id_product = ?");
+        $stmt->bind_param("ssiisdii", $name, $description, $id_category, $id_genre, $artist, $price, $stock, $id);
+        if ($stmt->execute()) {
+            $stmt->close();
             success();
         } else {
+            $stmt->close();
             error("Error al actualizar producto");
         }
     }
@@ -130,7 +164,10 @@
     if ($action === "delete_product") {
         $id = intval($_POST["id_product"]);
 
-        $res = $con->query("SELECT image FROM products WHERE id_product = $id");
+        $stmt = $con->prepare("SELECT image FROM products WHERE id_product = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
         if ($res && $res->num_rows > 0) {
             $row = $res->fetch_assoc();
             $image_path = __DIR__ . "/../" . $row["image"];
@@ -138,10 +175,15 @@
                 unlink($image_path);
             }
         }
+        $stmt->close();
 
-        if ($con->query("DELETE FROM products WHERE id_product = $id")) {
+        $stmt = $con->prepare("DELETE FROM products WHERE id_product = ?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $stmt->close();
             success();
         } else {
+            $stmt->close();
             error("Error al eliminar producto");
         }
     }
@@ -154,29 +196,48 @@
         $sql = "SELECT * FROM v_orders";
         $countSql = "SELECT COUNT(*) AS total FROM v_orders";
         $condition = "";
+        $types = "";
+        $params = [];
 
         if (isset($_GET["status"]) && $_GET["status"] != "") {
-            $status = $con->real_escape_string($_GET["status"]);
-            $condition .= " AND status = '$status'";
+            $condition .= " AND status = ?";
+            $types .= "s";
+            $params[] = $_GET["status"];
         }
         if (isset($_GET["search"]) && $_GET["search"] != "") {
-            $search = $con->real_escape_string($_GET["search"]);
-            $condition .= " AND (client_name LIKE '%$search%' OR email LIKE '%$search%')";
+            $search = "%" . $_GET["search"] . "%";
+            $condition .= " AND (client_name LIKE ? OR email LIKE ?)";
+            $types .= "ss";
+            $params[] = $search;
+            $params[] = $search;
         }
 
         if ($condition != "") {
-            $where = " WHERE " . substr($condition, 5);
+            $where = " WHERE " . substr($condition, 4);
             $sql .= $where;
             $countSql .= $where;
         }
 
-        $totalRes = $con->query($countSql);
-        $total = $totalRes->fetch_assoc()["total"];
+        $stmt = $con->prepare($countSql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $total = $stmt->get_result()->fetch_assoc()["total"];
+        $stmt->close();
 
         $sql .= " ORDER BY date DESC LIMIT $limit OFFSET $offset";
-        $res = $con->query($sql);
+        $stmt = $con->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orders = $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        $stmt->close();
+
         success([
-            "orders" => $res->num_rows > 0 ? $res->fetch_all(MYSQLI_ASSOC) : [],
+            "orders" => $orders,
             "total" => intval($total),
             "page" => $page,
             "pages" => ceil($total / $limit)
@@ -185,10 +246,16 @@
 
     if ($action === "order_detail") {
         $id = intval($_GET["id"]);
-        $res = $con->query("SELECT * FROM v_order_detail WHERE id_order = $id");
+        $stmt = $con->prepare("SELECT * FROM v_order_detail WHERE id_order = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
         if ($res && $res->num_rows > 0) {
-            success(["items" => $res->fetch_all(MYSQLI_ASSOC)]);
+            $items = $res->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            success(["items" => $items]);
         } else {
+            $stmt->close();
             success(["items" => []]);
         }
     }

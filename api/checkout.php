@@ -15,17 +15,22 @@
 
     if ($action === "confirm") {
         $id_order = intval($_POST["id_order"] ?? 0);
-        $con->query("UPDATE orders SET status = 'paid' 
-                     WHERE id_order = $id_order AND id_user = $id_user");
+        $stmt = $con->prepare("UPDATE orders SET status = 'paid' WHERE id_order = ? AND id_user = ?");
+        $stmt->bind_param("ii", $id_order, $id_user);
+        $stmt->execute();
+        $stmt->close();
         success();
         exit;
     }
 
-    $res = $con->query("SELECT c.id_product, c.quantity, p.name, p.price, p.stock
-                        FROM cart c
-                        INNER JOIN products p ON c.id_product = p.id_product
-                        WHERE c.id_user = $id_user");
-    $items = $res->fetch_all(MYSQLI_ASSOC);
+    $stmt = $con->prepare("SELECT c.id_product, c.quantity, p.name, p.price, p.stock
+                          FROM cart c
+                          INNER JOIN products p ON c.id_product = p.id_product
+                          WHERE c.id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 
     if (empty($items)) {
         error("El carrito esta vacio");
@@ -41,19 +46,24 @@
 
     if (isset($_POST["id_address"])) {
         $id_address = intval($_POST["id_address"]);
-        $res_check = $con->query("SELECT id_address FROM addresses 
-                                  WHERE id_address = $id_address AND id_user = $id_user");
-        if ($res_check->num_rows === 0) {
+        $stmt = $con->prepare("SELECT id_address FROM addresses WHERE id_address = ? AND id_user = ?");
+        $stmt->bind_param("ii", $id_address, $id_user);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) {
+            $stmt->close();
             error("Direccion no valida");
         }
+        $stmt->close();
     } else if (isset($_POST["new_address"])) {
-        $street = $con->real_escape_string($_POST["street"]);
+        $street = $_POST["street"];
         $city = intval($_POST["city"]);
-        $cp = $con->real_escape_string($_POST["cp"]);
+        $cp = $_POST["cp"];
 
-        $con->query("INSERT INTO addresses (id_user, id_city, cp, street_address)
-                     VALUES ($id_user, $city, '$cp', '$street')");
+        $stmt = $con->prepare("INSERT INTO addresses (id_user, id_city, cp, street_address) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("iiss", $id_user, $city, $cp, $street);
+        $stmt->execute();
         $id_address = $con->insert_id;
+        $stmt->close();
     }
 
     $total = 0;
@@ -61,20 +71,33 @@
         $total += $item["price"] * $item["quantity"];
     }
 
-    $con->query("INSERT INTO orders (id_user, id_address, total, status, date)
-                 VALUES ($id_user, $id_address, $total, 'pending', NOW())");
+    $stmt = $con->prepare("INSERT INTO orders (id_user, id_address, total, status, date) VALUES (?, ?, ?, 'pending', NOW())");
+    $stmt->bind_param("iid", $id_user, $id_address, $total);
+    $stmt->execute();
     $id_order = $con->insert_id;
+    $stmt->close();
 
     foreach ($items as $item) {
         $subtotal = $item["price"] * $item["quantity"];
-        $con->query("INSERT INTO order_detail (id_order, id_product, quantity, unit_price)
-                     VALUES ($id_order, {$item['id_product']}, {$item['quantity']}, $subtotal)");
+        $id_product = $item['id_product'];
+        $quantity = $item['quantity'];
 
-        $new_stock = $item["stock"] - $item["quantity"];
-        $con->query("UPDATE products SET stock = $new_stock WHERE id_product = {$item['id_product']}");
+        $stmt_ins = $con->prepare("INSERT INTO order_detail (id_order, id_product, quantity, unit_price) VALUES (?, ?, ?, ?)");
+        $stmt_ins->bind_param("iiid", $id_order, $id_product, $quantity, $subtotal);
+        $stmt_ins->execute();
+        $stmt_ins->close();
+
+        $new_stock = $item["stock"] - $quantity;
+        $stmt_stock = $con->prepare("UPDATE products SET stock = ? WHERE id_product = ?");
+        $stmt_stock->bind_param("ii", $new_stock, $id_product);
+        $stmt_stock->execute();
+        $stmt_stock->close();
     }
 
-    $con->query("DELETE FROM cart WHERE id_user = $id_user");
+    $stmt = $con->prepare("DELETE FROM cart WHERE id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $stmt->close();
 
     $stripe = new \Stripe\StripeClient(STRIPE_SECRET);
 

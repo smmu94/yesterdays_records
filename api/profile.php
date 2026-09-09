@@ -9,32 +9,45 @@
 
     $id_user = get_user_id();
     $page = max(1, intval($_GET["page"] ?? 1));
-    $limit = 5;
+    $limit = 50;
     $offset = ($page - 1) * $limit;
 
-    $res = $con->query("SELECT name, email FROM users WHERE id_user = $id_user");
-    $user = $res->fetch_assoc();
+    $stmt = $con->prepare("SELECT name, email FROM users WHERE id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $user = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-    $totalRes = $con->query("SELECT COUNT(*) AS total FROM orders WHERE id_user = $id_user");
-    $total = $totalRes->fetch_assoc()["total"];
+    $stmt = $con->prepare("SELECT COUNT(*) AS total FROM orders WHERE id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $total = $stmt->get_result()->fetch_assoc()["total"];
+    $stmt->close();
 
-    $res = $con->query("SELECT o.id_order, o.total, o.status, o.date,
-                        a.street_address, a.cp, ci.name AS city_name
-                        FROM orders o
-                        INNER JOIN addresses a ON o.id_address = a.id_address
-                        INNER JOIN cities ci ON a.id_city = ci.id_city
-                        WHERE o.id_user = $id_user
-                        ORDER BY o.date DESC
-                        LIMIT $limit OFFSET $offset");
-    $orders = $res->fetch_all(MYSQLI_ASSOC);
+    $stmt = $con->prepare("SELECT o.id_order, o.total, o.status, o.date,
+                          a.street_address, a.cp, ci.name AS city_name
+                          FROM orders o
+                          INNER JOIN addresses a ON o.id_address = a.id_address
+                          INNER JOIN cities ci ON a.id_city = ci.id_city
+                          WHERE o.id_user = ?
+                          ORDER BY o.date DESC
+                          LIMIT ? OFFSET ?");
+    $stmt->bind_param("iii", $id_user, $limit, $offset);
+    $stmt->execute();
+    $orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 
     foreach ($orders as &$order) {
-        $res = $con->query("SELECT od.quantity, od.unit_price,
-                            p.name AS product_name, p.artist, p.image
-                            FROM order_detail od
-                            INNER JOIN products p ON od.id_product = p.id_product
-                            WHERE od.id_order = {$order['id_order']}");
-        $order["items"] = $res->fetch_all(MYSQLI_ASSOC);
+        $id_order = $order['id_order'];
+        $stmt = $con->prepare("SELECT od.quantity, od.unit_price,
+                              p.name AS product_name, p.artist, COALESCE(NULLIF(p.image, ''), 'assets/default.webp') AS image
+                              FROM order_detail od
+                              INNER JOIN products p ON od.id_product = p.id_product
+                              WHERE od.id_order = ?");
+        $stmt->bind_param("i", $id_order);
+        $stmt->execute();
+        $order["items"] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
     }
 
     success([

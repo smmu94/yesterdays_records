@@ -148,15 +148,15 @@ function registerCatalogEvents() {
 
     $("body").on("input", "#search-input", function() {
         if ($(this).val().length > 0) {
-            $("#clear-search").show();
+            showEl("#clear-search");
         } else {
-            $("#clear-search").hide();
+            hideEl("#clear-search");
         }
     });
 
     $("body").on("click", "#clear-search", function() {
         $("#search-input").val("");
-        $(this).hide();
+        hideEl("#clear-search");
         currentSearch = "";
         if ($("#products-grid").length) {
             loadProducts(activeCategory, activeGenre);

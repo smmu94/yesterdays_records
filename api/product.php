@@ -7,11 +7,18 @@
     }
 
     $id = intval($_GET["id"]);
-    $res = $con->query("SELECT * FROM v_products WHERE id_product = $id");
+    $stmt = $con->prepare("SELECT * FROM v_products WHERE id_product = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
 
     if ($res && $res->num_rows > 0) {
-        success(["product" => $res->fetch_assoc()]);
+        $product = $res->fetch_assoc();
+        if (empty($product["image"])) $product["image"] = "assets/default.webp";
+        $stmt->close();
+        success(["product" => $product]);
     } else {
+        $stmt->close();
         error("Producto no encontrado");
     }
 ?>
