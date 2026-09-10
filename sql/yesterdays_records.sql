@@ -1,12 +1,8 @@
 -- ============================================================
--- YESTERDAY'S RECORDS — Database creation + seed data script
+-- YESTERDAY'S RECORDS — Seed data script
 -- MySQL 8+ / MariaDB 10.4+
--- 9 tables: categories, genres, cities, users, products,
---           addresses, cart, orders, order_detail
+-- Importar en la base de datos que Infinity Free te asignó
 -- ============================================================
-
-CREATE DATABASE IF NOT EXISTS yesterdays_records CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE yesterdays_records;
 
 -- ============================================================
 -- TABLES
