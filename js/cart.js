@@ -36,7 +36,7 @@ async function loadCart() {
                         </div>
                     </div>
                 </td>
-                <td class="text-end">${price.toFixed(2)} €</td>
+                <td class="text-end d-none d-sm-table-cell">${price.toFixed(2)} €</td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
                         <button class="btn btn-sm btn-warning btn-cart-minus" data-id="${item.id_product}" data-qty="${item.quantity}">-</button>

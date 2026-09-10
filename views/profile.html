@@ -11,24 +11,54 @@
     <div id="profile-content" class="d-none">
         <h2 class="caprasimo-regular mb-4">Mi Perfil</h2>
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="profile-card">
                     <div class="profile-card-icon">
                         <i class="bi bi-person-circle"></i>
                     </div>
                     <h5 class="profile-card-title">Datos personales</h5>
-                    <div class="profile-info">
-                        <span class="profile-label">Nombre</span>
-                        <span class="profile-value" id="profile-name"></span>
+                    <div id="profile-view-mode">
+                        <div class="profile-info">
+                            <span class="profile-label">Nombre</span>
+                            <span class="profile-value" id="profile-name"></span>
+                        </div>
+                        <div class="profile-info">
+                            <span class="profile-label">Email</span>
+                            <span class="profile-value" id="profile-email"></span>
+                        </div>
+                        <button class="btn btn-warning w-100" id="btn-edit-profile">
+                            <i class="bi bi-pencil me-1"></i> Editar datos
+                        </button>
                     </div>
-                    <div class="profile-info">
-                        <span class="profile-label">Email</span>
-                        <span class="profile-value" id="profile-email"></span>
+                    <div id="profile-edit-mode" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="edit-name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit-email">
+                        </div>
+                        <div id="profile-edit-error" class="alert alert-danger d-none py-2 small"></div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-warning" id="btn-save-profile">
+                                <span class="spinner-border spinner-border-sm d-none" id="profile-save-spinner"></span>
+                                <i class="bi bi-check-lg" id="profile-save-icon"></i> Guardar
+                            </button>
+                            <button class="btn btn-outline-secondary" id="btn-cancel-profile">Cancelar</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 <div class="profile-card">
+                    <h5 class="profile-card-title">Mis direcciones</h5>
+                    <div id="address-list" class="mb-3">
+                        <p class="text-secondary mb-0">Cargando direcciones...</p>
+                    </div>
+                    <button class="btn btn-warning w-100" id="btn-add-address"><i class="bi bi-plus-lg me-1"></i> Añadir dirección</button>
+                </div>
+                <div class="profile-card mt-4">
                     <h5 class="profile-card-title">Mis pedidos</h5>
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle mb-0">
@@ -83,6 +113,42 @@
                     <strong>Total</strong>
                     <strong id="modal-order-total"></strong>
             </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="address-modal-title">Nueva dirección</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="address-id">
+                <div class="mb-3">
+                    <label class="form-label">Calle y número</label>
+                    <input type="text" class="form-control" id="address-street" placeholder="Calle Real 12, 3ºB">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ciudad</label>
+                    <select class="form-select" id="address-city">
+                        <option value="">Seleccionar ciudad...</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Código postal</label>
+                    <input type="text" class="form-control" id="address-cp" placeholder="15003">
+                </div>
+                <div id="address-error" class="alert alert-danger d-none py-2 small"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" id="btn-save-address">
+                    <span class="spinner-border spinner-border-sm d-none" id="address-save-spinner"></span>
+                    <i class="bi bi-check-lg" id="address-save-icon"></i> Guardar
+                </button>
             </div>
         </div>
     </div>

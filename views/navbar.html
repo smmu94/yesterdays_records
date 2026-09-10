@@ -4,21 +4,13 @@
         <i class="bi bi-vinyl text-warning fs-2"></i>
         <span class="caprasimo-regular fs-2 text-warning">Yesterday's Records</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Menu">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-3 me-auto">
-          <li class="nav-item admin-only d-none">
-            <a class="nav-link" href="#/admin/products">Productos</a>
-          </li>
-          <li class="nav-item admin-only d-none">
-            <a class="nav-link" href="#/admin/orders">Pedidos</a>
-          </li>
-      </ul>
-      <form class="d-flex flex-grow-1 mx-3" role="search" id="search-form">
-        <div class="input-group search-bar">
-          <input class="form-control" type="search" id="search-input" placeholder="Busca vinilos, cassettes, artistas..." aria-label="Buscar">
+      <form class="d-flex my-2 my-lg-0" role="search" id="search-form">
+        <div class="input-group search-bar w-100">
+          <input class="form-control" type="search" id="search-input" placeholder="Buscar vinilos, cassettes, artistas..." aria-label="Buscar">
           <button class="btn btn-outline-warning d-none" type="button" id="clear-search">
             <i class="bi bi-x-lg"></i>
           </button>
@@ -26,22 +18,27 @@
             <i class="bi bi-search"></i>
           </button>
         </div>
-        <button class="btn btn-outline-warning search-icon-mobile d-none" type="button" id="search-toggle">
-          <i class="bi bi-search"></i>
-        </button>
       </form>
-      <div class="navbar-user-area d-flex align-items-center gap-3">
+      <ul class="navbar-nav my-2 my-lg-0">
+          <li class="nav-item admin-only d-none">
+            <a class="nav-link" href="#/admin/products">Productos</a>
+          </li>
+          <li class="nav-item admin-only d-none">
+            <a class="nav-link" href="#/admin/orders">Pedidos</a>
+          </li>
+      </ul>
+      <div class="navbar-user-area d-flex align-items-center gap-3 my-2 my-lg-0 ms-lg-auto">
         <a class="nav-link cart" href="#/cart" style="position:relative;">
           <i class="bi bi-cart-fill fs-5"></i>
           <span class="badge rounded-pill bg-warning text-dark" id="cart-count">0</span>
         </a>
         <div class="navbar-separator"></div>
         <div class="auth-only">
-          <a class="btn btn-warning btn-sm" href="#/login">Iniciar sesión</a>
+          <a class="btn btn-warning btn-sm" href="#/login">Iniciar sesion</a>
         </div>
         <div class="dropdown user-only d-none">
           <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="user-name d-none d-lg-inline" id="user-display"></span>
+            <span id="user-display"></span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li class="client-only d-none"><a class="dropdown-item" href="#/profile">Mi Perfil</a></li>

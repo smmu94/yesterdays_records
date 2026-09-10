@@ -17,19 +17,22 @@ async function loadCheckout() {
         var subtotal = item.price * item.quantity;
         total += subtotal;
         container.append(`
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="checkout-item">
                 <div>
-                    <span class="fw-bold">${item.product_name}</span>
-                    <small class="text-secondary"> x${item.quantity}</small>
+                    <span class="item-name">${item.product_name}</span>
+                    <span class="item-qty"> x${item.quantity}</span>
                 </div>
-                <span>${subtotal.toFixed(2)} €</span>
+                <span class="item-price">${subtotal.toFixed(2)} €</span>
             </div>
         `);
     });
 
-    container.append(`<hr><div class="d-flex justify-content-between">
-        <strong>Total</strong><strong>${total.toFixed(2)} €</strong>
-    </div>`);
+    container.append(`
+        <div class="checkout-summary-total">
+            <strong>Total</strong>
+            <strong>${total.toFixed(2)} €</strong>
+        </div>
+    `);
 
     $("#checkout-total").text(total.toFixed(2));
 
@@ -51,23 +54,27 @@ async function loadCheckout() {
     if (addresses.length > 0) {
         addresses.forEach(function(addr, i) {
             containerAddr.append(`
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="address" 
-                           id="addr-${addr.id_address}" value="${addr.id_address}"
-                           ${i === 0 ? "checked" : ""}>
-                    <label class="form-check-label" for="addr-${addr.id_address}">
-                        ${addr.street_address}, ${addr.city_name} (${addr.cp})
-                    </label>
+                <div class="checkout-address-card mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="address" 
+                               id="addr-${addr.id_address}" value="${addr.id_address}"
+                               ${i === 0 ? "checked" : ""}>
+                        <label class="form-check-label" for="addr-${addr.id_address}">
+                            ${addr.street_address}, ${addr.city_name} (${addr.cp})
+                        </label>
+                    </div>
                 </div>
             `);
         });
     }
 
     containerAddr.append(`
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="radio" name="address" 
-                   id="addr-new" value="new" ${addresses.length === 0 ? "checked" : ""}>
-            <label class="form-check-label" for="addr-new">Nueva dirección</label>
+        <div class="checkout-address-card mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="address" 
+                       id="addr-new" value="new" ${addresses.length === 0 ? "checked" : ""}>
+                <label class="form-check-label" for="addr-new">Nueva dirección</label>
+            </div>
         </div>
     `);
 

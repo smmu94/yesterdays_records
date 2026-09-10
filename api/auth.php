@@ -10,7 +10,7 @@
         $name = $_POST["name"];
         $email = $_POST["email"];
         $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        $role = $_POST["role"] ?? "client";
+        $role = "client";
 
         $stmt = $con->prepare("SELECT id_user FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -31,13 +31,17 @@
 
         if ($stmt->execute()) {
             $stmt->close();
+            $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+            $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'];
+            $verify_url = $base_url . dirname($_SERVER['SCRIPT_NAME']) . "/auth.php?action=verify&tok=$token";
+
             $para = $email;
             $asunto = "Activa tu cuenta en Yesterdays Records";
             $mensaje = "
                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
                     <h2>Bienvenido/a $name!</h2>
                     <p>Haz clic en el enlace para activar tu cuenta:</p>
-                    <a href='http://localhost/efbs_web/portfolio/yesterday_records/api/auth.php?action=verify&tok=$token'
+                    <a href='$verify_url'
                        style='display:inline-block; padding:12px 24px; background:#6c5ce7; color:#fff; text-decoration:none; border-radius:6px;'>
                         Activar mi cuenta
                     </a>

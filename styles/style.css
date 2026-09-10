@@ -90,6 +90,7 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
+    overflow-x: hidden;
 }
 
 html {
@@ -186,10 +187,6 @@ h4, h5, h6 {
     max-width: 450px;
 }
 
-.search-icon-mobile {
-    display: none !important;
-}
-
 #search-input {
     background-color: #fff !important;
     border-color: var(--color-primary);
@@ -281,32 +278,10 @@ h4, h5, h6 {
     border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
-/* Mobile search toggle */
+/* Mobile search */
 @media (max-width: 991.98px) {
-    .search-bar {
-        display: none !important;
-    }
-    .search-icon-mobile {
-        display: flex !important;
-    }
-    .search-bar.search-active {
-        display: flex !important;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        padding: 0.5rem 1rem;
-        background-color: rgba(10, 10, 10, 0.95);
-        z-index: 1050;
-    }
-    .search-bar.search-active .input-group {
-        max-width: 100%;
-    }
     .navbar-separator {
         display: none;
-    }
-    .user-name {
-        display: none !important;
     }
 }
 
@@ -399,6 +374,15 @@ h4, h5, h6 {
     border-radius: var(--radius-lg);
     padding: 2rem;
     min-height: calc(100vh - 80px);
+    max-width: 100%;
+}
+
+@media (max-width: 575.98px) {
+    #app .container {
+        padding: 1rem;
+        border-radius: 0;
+        min-height: auto;
+    }
 }
 
 /* ============================================
@@ -654,41 +638,26 @@ h4, h5, h6 {
 }
 
 /* ============================================
-   CHECKOUT (light theme)
+   CHECKOUT (dark theme — usa profile-card)
    ============================================ */
 .checkout {
     background-color: transparent !important;
 }
 
-.checkout .card {
-    background-color: var(--checkout-bg);
-    border: 1px solid var(--checkout-border);
-    border-radius: var(--radius-lg);
-}
-
-.checkout .card-header {
-    background-color: var(--checkout-header-bg);
-    border-bottom: 1px solid var(--checkout-border);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
-    color: var(--checkout-text);
-    font-weight: var(--fw-semibold);
-}
-
-.checkout .card-body {
-    padding: 1.5rem;
-    color: var(--checkout-text-body);
-    background-color: var(--checkout-bg);
-}
-
 .checkout .form-check-label {
-    color: var(--checkout-text) !important;
+    color: var(--text-primary) !important;
     font-weight: var(--fw-medium);
 }
 
 .checkout .form-label {
-    color: var(--checkout-text-body) !important;
+    color: var(--text-secondary) !important;
     font-weight: var(--fw-medium);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
+}
+
+.checkout .form-check-input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
 }
 
 .checkout .form-check-input:checked {
@@ -701,11 +670,11 @@ h4, h5, h6 {
 }
 
 .checkout h4 {
-    color: var(--checkout-text) !important;
+    color: var(--text-primary) !important;
 }
 
 .checkout .breadcrumb-item.active {
-    color: var(--checkout-text-muted) !important;
+    color: var(--text-muted) !important;
 }
 
 .checkout .breadcrumb-item a {
@@ -721,8 +690,79 @@ h4, h5, h6 {
 }
 
 .checkout #btn-pay:hover {
-    background-color: var(--color-primary-dark);
-    border-color: var(--color-primary-dark);
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+}
+
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.checkout-item:last-child {
+    border-bottom: none;
+}
+
+.checkout-item .item-name {
+    color: var(--text-primary);
+    font-weight: var(--fw-medium);
+}
+
+.checkout-item .item-qty {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+.checkout-item .item-price {
+    color: var(--text-primary);
+    font-weight: var(--fw-semibold);
+}
+
+.checkout-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 2px solid var(--color-primary);
+}
+
+.checkout-summary-total strong {
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+}
+
+.checkout-pay-bar {
+    background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(15, 15, 15, 0.98));
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkout-pay-bar h4 {
+    margin: 0;
+}
+
+.checkout-pay-bar strong {
+    color: var(--color-primary);
+}
+
+.checkout-address-card {
+    padding: 0.75rem 1rem;
+    background: transparent;
+    transition: background var(--transition-fast);
+}
+
+.checkout-address-card:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.checkout-address-card .form-check {
+    margin-bottom: 0;
 }
 
 /* ============================================
@@ -873,6 +913,24 @@ h4, h5, h6 {
     font-weight: var(--fw-medium);
 }
 
+.address-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.address-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+}
+
+.address-card .address-info span {
+    color: var(--text-primary);
+    font-weight: var(--fw-medium);
+}
+
 /* ============================================
    PAGINATION
    ============================================ */
@@ -992,4 +1050,254 @@ h4, h5, h6 {
     padding: 0.4rem 0;
     border-left: 1px solid rgba(255, 193, 7, 0.2);
     border-right: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* ============================================
+   RESPONSIVE — GLOBAL
+   ============================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#app {
+    overflow-x: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive > .table {
+    min-width: 600px;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--bg-surface-solid);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-hover);
+}
+
+/* ============================================
+   RESPONSIVE — NAVBAR (≤ 991px)
+   ============================================ */
+@media (max-width: 991.98px) {
+    .navbar-brand {
+        padding-left: 1rem;
+        padding-right: 0.5rem;
+    }
+
+    .navbar-brand .caprasimo-regular {
+        font-size: 1.25rem !important;
+    }
+
+    .navbar-collapse {
+        padding: 1rem 0;
+        border-top: 1px solid var(--border-subtle);
+    }
+
+    .navbar-nav {
+        padding: 0.5rem 0;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0;
+    }
+
+    .navbar-user-area {
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border-subtle);
+        justify-content: flex-start;
+        gap: 1rem !important;
+    }
+
+    .navbar-user-area .cart {
+        font-size: 1.1rem;
+    }
+
+    .navbar-user-area .dropdown {
+        flex-shrink: 0;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — FILTERS (catalog)
+   ============================================ */
+.catalog-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.catalog-filters .btn {
+    flex-shrink: 0;
+}
+
+/* ============================================
+   RESPONSIVE — HERO
+   ============================================ */
+@media (max-width: 767.98px) {
+    .hero h1 {
+        font-size: var(--text-3xl);
+    }
+
+    .hero h5 {
+        font-size: var(--text-base);
+    }
+
+    .hero .btn {
+        font-size: var(--text-sm);
+        padding: 0.5rem 1.5rem;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — CARDS GRID
+   ============================================ */
+@media (max-width: 575.98px) {
+    .product-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .product-card .card-title {
+        font-size: var(--text-sm);
+    }
+
+    .product-card .card-text {
+        font-size: var(--text-xs);
+    }
+}
+
+/* ============================================
+   RESPONSIVE — PRODUCT DETAIL
+   ============================================ */
+@media (max-width: 767.98px) {
+    .product-image-wrapper {
+        padding: 1rem;
+    }
+
+    .product-image-wrapper img {
+        max-height: 300px;
+    }
+
+    .product-action-zone {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — CART
+   ============================================ */
+@media (max-width: 767.98px) {
+    .cart-thumb {
+        width: 60px;
+        height: 60px;
+    }
+
+    .cart-table td {
+        padding: 0.5rem;
+        font-size: var(--text-sm);
+    }
+
+    .cart-table th {
+        font-size: 0.65rem;
+    }
+
+    .cart-total-bar {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — CHECKOUT
+   ============================================ */
+@media (max-width: 767.98px) {
+    .checkout-pay-bar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .checkout-pay-bar .text-end {
+        text-align: center !important;
+    }
+
+    .checkout-pay-bar h4 {
+        font-size: var(--text-lg);
+    }
+}
+
+/* ============================================
+   RESPONSIVE — ADMIN
+   ============================================ */
+@media (max-width: 767.98px) {
+    .admin-filter-row .col-md-5,
+    .admin-filter-row .col-md-4,
+    .admin-filter-row .col-md-1 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-filter-row .btn {
+        width: 100%;
+    }
+
+    .table-thumb {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — ADMIN PRODUCT FORM
+   ============================================ */
+@media (max-width: 767.98px) {
+    .form-image-preview {
+        min-height: 180px;
+    }
+
+    .form-image-preview img {
+        max-width: 150px;
+        max-height: 150px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — PROFILE
+   ============================================ */
+@media (max-width: 767.98px) {
+    .profile-card {
+        padding: 1.25rem;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — MODALS
+   ============================================ */
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-content {
+        border-radius: var(--radius-md);
+    }
 }

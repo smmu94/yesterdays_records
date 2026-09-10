@@ -8,6 +8,42 @@
     }
 
     $id_user = get_user_id();
+    $action = $_GET["action"] ?? $_POST["action"] ?? "";
+
+    if ($action === "update_profile") {
+        $name = trim($_POST["name"] ?? "");
+        $email = trim($_POST["email"] ?? "");
+
+        if ($name === "" || $email === "") {
+            error("Nombre y email son obligatorios");
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            error("Email no valido");
+        }
+
+        $stmt = $con->prepare("SELECT id_user FROM users WHERE email = ? AND id_user != ?");
+        $stmt->bind_param("si", $email, $id_user);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows > 0) {
+            $stmt->close();
+            error("Este email ya esta registrado");
+        }
+        $stmt->close();
+
+        $stmt = $con->prepare("UPDATE users SET name = ?, email = ? WHERE id_user = ?");
+        $stmt->bind_param("ssi", $name, $email, $id_user);
+        if ($stmt->execute()) {
+            $stmt->close();
+            $_SESSION["logueado"]["name"] = $name;
+            $_SESSION["logueado"]["email"] = $email;
+            success(["message" => "Perfil actualizado", "user" => ["name" => $name, "email" => $email]]);
+        } else {
+            $stmt->close();
+            error("Error al actualizar el perfil");
+        }
+    }
+
     $page = max(1, intval($_GET["page"] ?? 1));
     $limit = 50;
     $offset = ($page - 1) * $limit;

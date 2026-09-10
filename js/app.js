@@ -17,7 +17,7 @@ var dynamicRoutes = [
     { pattern: "#/admin/product/edit", view: "views/admin/product-form.html" }
 ];
 
-var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart"];
+var publicRoutes = ["#/home", "#/login", "#/register", "#/verify", "#/cart", "#/404"];
 
 var routeHandlers = {
     "#/home": async function() {
@@ -154,9 +154,9 @@ async function loadView(hash) {
     var route = resolveRoute(cleanHash);
 
     if (!route) {
-        history.pushState(null, "", "#/home");
-        route = { view: routes["#/home"], key: "#/home" };
-        cleanHash = "#/home";
+        history.pushState(null, "", "#/404");
+        route = { view: "views/404.html", key: "#/404" };
+        cleanHash = "#/404";
     }
 
     var perm = checkPermissions(cleanHash);
@@ -229,18 +229,6 @@ function registerNavEvents() {
         }
     });
 
-    $("body").on("click", "#search-toggle", function() {
-        $(".search-bar").toggleClass("search-active");
-        if ($(".search-bar").hasClass("search-active")) {
-            $("#search-input").focus();
-        }
-    });
-
-    $("body").on("click", function(e) {
-        if (!$(e.target).closest(".search-bar, #search-toggle").length) {
-            $(".search-bar").removeClass("search-active");
-        }
-    });
 }
 
 function updateActiveNavLink(hash) {

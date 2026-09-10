@@ -29,7 +29,7 @@ async function loadProducts(category, genre, search, page) {
 
     products.forEach(product => {
         var card = `
-            <div class="col-md-4 mb-4 reveal">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 reveal">
                 <div class="card product-card h-100">
                     <img src="${product.image}" class="card-img-top" alt="${product.name}">
                     <div class="card-body">

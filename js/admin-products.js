@@ -101,6 +101,30 @@ async function loadProductForm(id) {
 }
 
 function saveProduct() {
+    var name = $("#form-name").val().trim();
+    var artist = $("#form-artist").val().trim();
+    var description = $("#form-description").val().trim();
+    var price = parseFloat($("#form-price").val());
+    var stock = parseInt($("#form-stock").val());
+    var category = $("#form-category").val();
+
+    if (!name || !artist || !description || !category) {
+        $("#form-error").text("Todos los campos son obligatorios").removeClass("d-none");
+        return;
+    }
+
+    if (isNaN(price) || price < 0) {
+        $("#form-error").text("El precio no puede ser negativo").removeClass("d-none");
+        return;
+    }
+
+    if (isNaN(stock) || stock < 0) {
+        $("#form-error").text("El stock no puede ser negativo").removeClass("d-none");
+        return;
+    }
+
+    $("#form-error").addClass("d-none");
+
     var id = $("#form-id").val();
     var fileInput = $("#form-image")[0].files[0];
 
