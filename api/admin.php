@@ -37,8 +37,8 @@
         $limit = 100;
         $offset = ($page - 1) * $limit;
 
-        $sql = "SELECT * FROM v_products";
-        $countSql = "SELECT COUNT(*) AS total FROM v_products";
+        $sql = "SELECT p.*, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
+        $countSql = "SELECT COUNT(*) AS total FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
         $condition = "";
         $types = "";
         $params = [];
@@ -193,8 +193,8 @@
         $limit = 100;
         $offset = ($page - 1) * $limit;
 
-        $sql = "SELECT * FROM v_orders";
-        $countSql = "SELECT COUNT(*) AS total FROM v_orders";
+        $sql = "SELECT o.*, u.name AS client_name, u.email, a.street_address, a.cp, ci.name AS city_name FROM orders o INNER JOIN users u ON o.id_user = u.id_user INNER JOIN addresses a ON o.id_address = a.id_address INNER JOIN cities ci ON a.id_city = ci.id_city";
+        $countSql = "SELECT COUNT(*) AS total FROM orders o INNER JOIN users u ON o.id_user = u.id_user INNER JOIN addresses a ON o.id_address = a.id_address INNER JOIN cities ci ON a.id_city = ci.id_city";
         $condition = "";
         $types = "";
         $params = [];
@@ -246,7 +246,7 @@
 
     if ($action === "order_detail") {
         $id = intval($_GET["id"]);
-        $stmt = $con->prepare("SELECT * FROM v_order_detail WHERE id_order = ?");
+        $stmt = $con->prepare("SELECT od.*, p.name AS product_name, p.artist FROM order_detail od INNER JOIN products p ON od.id_product = p.id_product WHERE od.id_order = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $res = $stmt->get_result();

@@ -1,6 +1,3 @@
 <?php
-    $con = new mysqli("localhost", "root", "", "yesterdays_records");
+    $con = new mysqli("sql102.infinityfree.com", "if0_42885270", "Smmu24940729", "if0_42885270_yesterdays_records");
     $con->set_charset("utf8mb4");
-
-    include(__DIR__."/views.php");
-    createViews($con);

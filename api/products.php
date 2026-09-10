@@ -6,8 +6,8 @@
     $limit = max(1, min(50, intval($_GET["limit"] ?? 20)));
     $offset = ($page - 1) * $limit;
 
-    $sql = "SELECT * FROM v_products";
-    $countSql = "SELECT COUNT(*) AS total FROM v_products";
+    $sql = "SELECT p.*, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
+    $countSql = "SELECT COUNT(*) AS total FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
     $condition = "";
     $types = "";
     $params = [];
