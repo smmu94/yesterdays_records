@@ -158,7 +158,7 @@ function saveAddress() {
 
         var modal = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
         modal.hide();
-        showToast("Exito", id ? "Dirección actualizada" : "Dirección creada", "success");
+        showToast("Éxito", id ? "Dirección actualizada" : "Dirección creada", "success");
         loadAddresses();
     });
 }
@@ -195,7 +195,7 @@ function registerProfileEvents() {
         tbody.empty();
 
         order.items.forEach(function(item) {
-            var subtotal = item.unit_price;
+            var subtotal = item.unit_price * item.quantity;
             tbody.append(`
                 <tr>
                     <td>${item.product_name}</td>
@@ -266,7 +266,7 @@ function registerProfileEvents() {
             session.email = result.user.email;
             hideEl("#profile-edit-mode");
             showEl("#profile-view-mode");
-            showToast("Exito", "Perfil actualizado", "success");
+            showToast("Éxito", "Perfil actualizado", "success");
         });
     });
 

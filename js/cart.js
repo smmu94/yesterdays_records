@@ -29,10 +29,10 @@ async function loadCart() {
             <tr>
                 <td>
                     <div class="d-flex align-items-center gap-3">
-                        <img src="${item.image}" alt="${item.product_name}" class="cart-thumb">
+                        <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.product_name)}" class="cart-thumb">
                         <div>
-                            <p class="mb-0 fw-bold">${item.product_name}</p>
-                            <small class="text-secondary">${item.artist}</small>
+                            <p class="mb-0 fw-bold">${escapeHtml(item.product_name)}</p>
+                            <small class="text-secondary">${escapeHtml(item.artist)}</small>
                         </div>
                     </div>
                 </td>

@@ -31,10 +31,10 @@ async function loadProducts(category, genre, search, page) {
         var card = `
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 reveal">
                 <div class="card product-card h-100">
-                    <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                    <img src="${escapeHtml(product.image)}" class="card-img-top" alt="${escapeHtml(product.name)}">
                     <div class="card-body">
-                        <h5 class="card-title">${product.name}</h5>
-                        <p class="card-text">${product.artist}</p>
+                        <h5 class="card-title">${escapeHtml(product.name)}</h5>
+                        <p class="card-text">${escapeHtml(product.artist)}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <p class="card-text fw-bold mb-0">${product.price} €</p>
                             <button class="btn btn-warning btn-add-cart" data-id="${product.id_product}"><i class="bi bi-cart-plus"></i></button>

@@ -289,4 +289,14 @@ $(window).on("popstate", function() {
     loadView(window.location.hash || "#/home");
 });
 
+$("body").on("click", "#btn-logout", function(e) {
+    e.preventDefault();
+    $.get("api/auth.php?action=logout", function() {
+        session = {};
+        updateNavbar();
+        history.pushState(null, "", "#/home");
+        loadView("#/home");
+    });
+});
+
 init();

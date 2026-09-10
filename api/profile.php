@@ -4,7 +4,7 @@
     @session_start();
 
     if (!is_logged_in()) {
-        error("Debes iniciar sesion");
+        error("Debes iniciar sesión");
     }
 
     $id_user = get_user_id();

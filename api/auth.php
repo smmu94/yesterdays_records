@@ -150,7 +150,7 @@
                 }
             } else {
                 $stmt->close();
-                error("Contrasena invalida");
+                error("Contraseña inválida");
             }
         } else {
             $stmt->close();
@@ -195,7 +195,7 @@
             check_session();
             break;
         default:
-            error("Accion no valida");
+            error("Acción no válida");
             break;
     }
 ?>

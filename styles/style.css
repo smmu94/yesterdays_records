@@ -129,11 +129,6 @@ h4, h5, h6 {
     padding-right: 2rem;
 }
 
-.navbar-brand img {
-    height: 50px;
-    width: auto;
-}
-
 .nav-link {
     font-family: var(--font-body);
     font-size: var(--text-base);
@@ -183,8 +178,8 @@ h4, h5, h6 {
    SEARCH
    ============================================ */
 .search-bar {
-    width: 100%;
-    max-width: 450px;
+    width: 100% !important;
+    max-width: 700px;
 }
 
 #search-input {
@@ -571,18 +566,6 @@ h4, h5, h6 {
     color: var(--text-secondary);
 }
 
-#app .card .btn-primary {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--text-on-primary);
-    font-weight: var(--fw-medium);
-}
-
-#app .card .btn-primary:hover {
-    background-color: var(--color-primary-hover);
-    border-color: var(--color-primary-hover);
-}
-
 /* ============================================
    CART
    ============================================ */
@@ -768,9 +751,6 @@ h4, h5, h6 {
 /* ============================================
    ADMIN — Forms
    ============================================ */
-.admin-form .form-label {
-    color: var(--text-secondary);
-}
 
 .form-image-preview {
     background-color: rgba(255, 255, 255, 0.05);
@@ -833,10 +813,6 @@ h4, h5, h6 {
 /* ============================================
    BADGES
    ============================================ */
-.badge-status {
-    font-size: var(--text-xs);
-    padding: 0.35em 0.65em;
-}
 
 /* ============================================
    PROFILE

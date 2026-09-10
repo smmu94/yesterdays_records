@@ -8,6 +8,19 @@ function formatDate(dateStr) {
     return parts[2] + "/" + parts[1] + "/" + parts[0];
 }
 
+var _debounceTimers = {};
+function debounce(key, fn, delay) {
+    clearTimeout(_debounceTimers[key]);
+    _debounceTimers[key] = setTimeout(fn, delay);
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    var div = document.createElement("div");
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
 function showToast(titulo, mensaje, tipo) {
     var toast = $("#app-toast");
     var header = toast.find(".toast-header");

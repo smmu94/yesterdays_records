@@ -95,7 +95,7 @@ function registerAdminOrderEvents() {
 
     $("body").on("input", "#admin-order-search", function() {
         adminOrderFilters.search = $(this).val();
-        loadAdminOrders(1);
+        debounce("admin-orders", function() { loadAdminOrders(1); }, 300);
     });
 
     $("body").on("change", "#admin-order-status", function() {

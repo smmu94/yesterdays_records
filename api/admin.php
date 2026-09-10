@@ -260,5 +260,5 @@
         }
     }
 
-    error("Accion no valida");
+    error("Acción no válida");
 ?>

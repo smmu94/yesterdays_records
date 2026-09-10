@@ -33,15 +33,15 @@ async function loadAdminProducts(page) {
     products.forEach(function(p) {
         var row = `
             <tr>
-                <td><img src="${p.image}" alt="${p.name}" class="table-thumb"></td>
-                <td>${p.name}</td>
-                <td>${p.artist}</td>
-                <td>${p.category_name}</td>
+                <td><img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" class="table-thumb"></td>
+                <td>${escapeHtml(p.name)}</td>
+                <td>${escapeHtml(p.artist)}</td>
+                <td>${escapeHtml(p.category_name)}</td>
                 <td>${p.price} €</td>
                 <td>${p.stock}</td>
                 <td>
                     <a href="#/admin/product/edit/${p.id_product}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
-                    <button class="btn btn-sm btn-danger btn-delete-product" data-id="${p.id_product}" data-name="${p.name}"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-danger btn-delete-product" data-id="${p.id_product}" data-name="${escapeHtml(p.name)}"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
         `;
@@ -170,7 +170,7 @@ function saveProduct() {
                 return;
             }
 
-            showToast("Exito", id ? "Producto actualizado" : "Producto creado", "success");
+            showToast("Éxito", id ? "Producto actualizado" : "Producto creado", "success");
             history.pushState(null, "", "#/admin/products");
             loadView("#/admin/products");
         },
@@ -238,7 +238,7 @@ function registerAdminProductEvents() {
 
     $("body").on("input", "#admin-product-search", function() {
         adminProductFilters.search = $(this).val();
-        loadAdminProducts(1);
+        debounce("admin-products", function() { loadAdminProducts(1); }, 300);
     });
 
     $("body").on("change", "#admin-product-category", function() {
