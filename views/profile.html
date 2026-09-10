@@ -11,7 +11,7 @@
     <div id="profile-content" class="d-none">
         <h2 class="caprasimo-regular mb-4">Mi Perfil</h2>
         <div class="row g-4">
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 d-flex flex-column gap-4">
                 <div class="profile-card">
                     <div class="profile-card-icon">
                         <i class="bi bi-person-circle"></i>
@@ -49,8 +49,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-12 col-md-8">
                 <div class="profile-card">
                     <h5 class="profile-card-title">Mis direcciones</h5>
                     <div id="address-list" class="mb-3">
@@ -58,9 +56,11 @@
                     </div>
                     <button class="btn btn-warning w-100" id="btn-add-address"><i class="bi bi-plus-lg me-1"></i> Añadir dirección</button>
                 </div>
-                <div class="profile-card mt-4">
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="profile-card profile-orders-card">
                     <h5 class="profile-card-title">Mis pedidos</h5>
-                    <div class="table-responsive">
+                    <div class="table-responsive flex-1">
                         <table class="table table-dark table-hover align-middle mb-0">
                             <thead>
                                 <tr>
@@ -128,17 +128,17 @@
             <div class="modal-body">
                 <input type="hidden" id="address-id">
                 <div class="mb-3">
-                    <label class="form-label">Calle y número</label>
+                    <label class="form-label fw-medium" style="color: #333;">Calle y número</label>
                     <input type="text" class="form-control" id="address-street" placeholder="Calle Real 12, 3ºB">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Ciudad</label>
+                    <label class="form-label fw-medium" style="color: #333;">Ciudad</label>
                     <select class="form-select" id="address-city">
                         <option value="">Seleccionar ciudad...</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Código postal</label>
+                    <label class="form-label fw-medium" style="color: #333;">Código postal</label>
                     <input type="text" class="form-control" id="address-cp" placeholder="15003">
                 </div>
                 <div id="address-error" class="alert alert-danger d-none py-2 small"></div>
@@ -147,7 +147,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning" id="btn-save-address">
                     <span class="spinner-border spinner-border-sm d-none" id="address-save-spinner"></span>
-                    <i class="bi bi-check-lg" id="address-save-icon"></i> Guardar
+                    Guardar
                 </button>
             </div>
         </div>

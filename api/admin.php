@@ -34,7 +34,7 @@
 
     if ($action === "list_products") {
         $page = max(1, intval($_GET["page"] ?? 1));
-        $limit = 50;
+        $limit = 100;
         $offset = ($page - 1) * $limit;
 
         $sql = "SELECT * FROM v_products";
@@ -190,7 +190,7 @@
 
     if ($action === "list_orders") {
         $page = max(1, intval($_GET["page"] ?? 1));
-        $limit = 50;
+        $limit = 100;
         $offset = ($page - 1) * $limit;
 
         $sql = "SELECT * FROM v_orders";

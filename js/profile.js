@@ -69,8 +69,8 @@ async function loadAddresses() {
                         <small class="text-secondary">${addr.city_name} (${addr.cp})</small>
                     </div>
                     <div class="d-flex gap-1 flex-shrink-0">
-                        <button class="btn btn-sm btn-outline-warning btn-edit-address" data-id="${addr.id_address}"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete-address" data-id="${addr.id_address}"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-sm btn-warning btn-edit-address" data-id="${addr.id_address}"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-danger btn-delete-address" data-id="${addr.id_address}"><i class="bi bi-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,6 @@ async function loadAddresses() {
 function openAddressModal(id) {
     $("#address-error").addClass("d-none");
     $("#save-address-spinner").addClass("d-none");
-    $("#address-save-icon").removeClass("d-none");
 
     if (id) {
         $("#address-modal-title").text("Editar dirección");
@@ -138,7 +137,6 @@ function saveAddress() {
     }
 
     $("#btn-save-address").prop("disabled", true);
-    $("#address-save-icon").addClass("d-none");
     $("#address-save-spinner").removeClass("d-none");
 
     var data = { action: id ? "update" : "create", street: street, city: city, cp: cp };
@@ -148,7 +146,6 @@ function saveAddress() {
         var result = typeof response === "string" ? JSON.parse(response) : response;
 
         $("#btn-save-address").prop("disabled", false);
-        $("#address-save-icon").removeClass("d-none");
         $("#address-save-spinner").addClass("d-none");
 
         if (result.ok === false) {

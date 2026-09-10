@@ -258,6 +258,11 @@ async function init() {
 
     registerNavEvents();
     registerCatalogEvents();
+
+    $("body").on("click", "#navbarNav .nav-link, #navbarNav .dropdown-item", function() {
+        var collapse = bootstrap.Collapse.getInstance(document.getElementById("navbarNav"));
+        if (collapse) collapse.hide();
+    });
     registerCartEvents();
     updateCartCount();
     registerCheckoutEvents();

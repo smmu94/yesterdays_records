@@ -9,7 +9,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <form class="d-flex my-2 my-lg-0" role="search" id="search-form">
-        <div class="input-group search-bar w-100">
+        <div class="input-group search-bar">
           <input class="form-control" type="search" id="search-input" placeholder="Buscar vinilos, cassettes, artistas..." aria-label="Buscar">
           <button class="btn btn-outline-warning d-none" type="button" id="clear-search">
             <i class="bi bi-x-lg"></i>
@@ -27,12 +27,13 @@
             <a class="nav-link" href="#/admin/orders">Pedidos</a>
           </li>
       </ul>
+      <hr class="d-lg-none text-secondary my-2">
       <div class="navbar-user-area d-flex align-items-center gap-3 my-2 my-lg-0 ms-lg-auto">
         <a class="nav-link cart" href="#/cart" style="position:relative;">
           <i class="bi bi-cart-fill fs-5"></i>
           <span class="badge rounded-pill bg-warning text-dark" id="cart-count">0</span>
         </a>
-        <div class="navbar-separator"></div>
+        <div class="navbar-separator d-none d-lg-block"></div>
         <div class="auth-only">
           <a class="btn btn-warning btn-sm" href="#/login">Iniciar sesión</a>
         </div>

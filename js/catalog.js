@@ -7,7 +7,7 @@ async function loadProducts(category, genre, search, page) {
         catalogPage = 1;
     }
 
-    var params = [`page=${catalogPage}`, "limit=20"];
+    var params = [`page=${catalogPage}`, "limit=21"];
 
     if (category) params.push(`category=${category}`);
     if (genre) params.push(`genre=${genre}`);
@@ -29,7 +29,7 @@ async function loadProducts(category, genre, search, page) {
 
     products.forEach(product => {
         var card = `
-            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 reveal">
+            <div class="col-12 col-lg-6 col-xl-4 mb-4 reveal">
                 <div class="card product-card h-100">
                     <img src="${escapeHtml(product.image)}" class="card-img-top" alt="${escapeHtml(product.name)}">
                     <div class="card-body">
@@ -46,20 +46,20 @@ async function loadProducts(category, genre, search, page) {
         grid.append(card);
     });
 
-    renderPagination(data.pages, data.page);
+    renderCatalogPagination(data.pages, data.page, category, genre, search);
     reinitEffects();
 }
 
-function renderPagination(totalPages, currentPage) {
+function renderCatalogPagination(totalPages, currentPage, category, genre, search) {
     var container = $("#catalog-pagination");
     container.empty();
 
     if (totalPages <= 1) return;
 
-    var html = '<nav><ul class="pagination">';
+    var html = '<nav><ul class="pagination catalog-pagination-list">';
 
     html += `<li class="page-item ${currentPage === 1 ? "disabled" : ""}">
-        <a class="page-link pagination-btn" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
+        <a class="page-link catalog-page-btn" href="#" data-page="${currentPage - 1}" data-category="${category || ""}" data-genre="${genre || ""}" data-search="${search || ""}">&laquo; Anterior</a>
     </li>`;
 
     for (var i = 1; i <= totalPages; i++) {
@@ -70,12 +70,12 @@ function renderPagination(totalPages, currentPage) {
             continue;
         }
         html += `<li class="page-item ${i === currentPage ? "active" : ""}">
-            <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+            <a class="page-link catalog-page-btn" href="#" data-page="${i}" data-category="${category || ""}" data-genre="${genre || ""}" data-search="${search || ""}">${i}</a>
         </li>`;
     }
 
     html += `<li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
-        <a class="page-link pagination-btn" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
+        <a class="page-link catalog-page-btn" href="#" data-page="${currentPage + 1}" data-category="${category || ""}" data-genre="${genre || ""}" data-search="${search || ""}">Siguiente &raquo;</a>
     </li>`;
 
     html += '</ul></nav>';
@@ -123,17 +123,22 @@ function registerCatalogEvents() {
         loadProducts(activeCategory, activeGenre, currentSearch);
     });
 
-    $("body").on("click", ".pagination-btn", function(e) {
+    $("body").on("click", ".catalog-page-btn", function(e) {
         e.preventDefault();
         var page = $(this).data("page");
         if (!page || page < 1) return;
-        loadProducts(activeCategory, activeGenre, currentSearch, page);
+        var category = $(this).data("category") || "";
+        var genre = $(this).data("genre") || "";
+        var search = $(this).data("search") || "";
+        loadProducts(category, genre, search, page);
         var catalog = document.getElementById("catalog");
         if (catalog) catalog.scrollIntoView({ behavior: "smooth" });
     });
 
     $("body").on("submit", "#search-form", async function(event) {
         event.preventDefault();
+        var collapse = bootstrap.Collapse.getInstance(document.getElementById("navbarNav"));
+        if (collapse) collapse.hide();
         var search = $("#search-input").val().trim();
         if (search !== "") {
             currentSearch = search;

@@ -45,7 +45,7 @@
     }
 
     $page = max(1, intval($_GET["page"] ?? 1));
-    $limit = 50;
+    $limit = 15;
     $offset = ($page - 1) * $limit;
 
     $stmt = $con->prepare("SELECT name, email FROM users WHERE id_user = ?");
