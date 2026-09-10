@@ -1,4 +1,5 @@
 <?php
+    error_reporting(E_ERROR | E_PARSE);
     include(__DIR__."/../config/database.php");
     include(__DIR__."/../config/helpers.php");
     @session_start();
