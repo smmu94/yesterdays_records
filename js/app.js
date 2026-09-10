@@ -294,6 +294,10 @@ $(window).on("popstate", function() {
     loadView(window.location.hash || "#/home");
 });
 
+$(window).on("hashchange", function() {
+    loadView(window.location.hash || "#/home");
+});
+
 $("body").on("click", "#btn-logout", function(e) {
     e.preventDefault();
     $.get("api/auth.php?action=logout", function() {
