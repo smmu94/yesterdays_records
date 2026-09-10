@@ -12,8 +12,6 @@
     }
 
     function respond($data) {
-        ob_clean();
-        header('Content-Type: application/json');
         echo json_encode($data);
         exit;
     }
