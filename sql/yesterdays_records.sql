@@ -5,8 +5,7 @@
 --           addresses, cart, orders, order_detail
 -- ============================================================
 
-DROP DATABASE IF EXISTS yesterdays_records;
-CREATE DATABASE yesterdays_records CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS yesterdays_records CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE yesterdays_records;
 
 -- ============================================================
