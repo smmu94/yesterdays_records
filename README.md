@@ -4,12 +4,12 @@ Tienda de discos de vinilo, cassettes, CDs y merchandising retro con temática d
 
 ## Screenshot
 
-> (Agrega capturas de pantalla aquí)
+![Home](./assets/home.png)
 
 ## Funcionalidades
 
 ### Clientes
-- Explorar catálogo de productos con filtros por categoría y búsqueda
+- Explorar catálogo de productos con filtros por categoría, género y búsqueda
 - Ver detalle de cada producto con selector de cantidad
 - Carrito de compras con persistencia
 - Checkout con integración Stripe (modo test)
@@ -21,7 +21,9 @@ Tienda de discos de vinilo, cassettes, CDs y merchandising retro con temática d
 - Panel de administración con productos y pedidos
 - CRUD completo de productos (crear, editar, eliminar)
 - Subida de imágenes para productos
-- Gestión de pedidos con cambio de estado
+- Gestión de pedidos: cambiar estado (pendiente/pagado/enviado)
+- Eliminar pedidos con restauración automática de stock
+- Cancelación masiva de pedidos pendientes mayores a 24hs
 - Filtros y búsqueda en productos y pedidos
 - Paginación en todas las listas
 
@@ -48,7 +50,7 @@ Necesitas tener instalado en tu computadora:
 ### 1. Clonar o descargar el proyecto
 
 ```bash
-git clone https://github.com/tu-usuario/yesterday-records.git
+git clone https://github.com/smmu94/yesterdays_records.git
 ```
 
 O descarga el ZIP desde GitHub y descomprímelo.
@@ -72,14 +74,23 @@ C:\xampp\htdocs\yesterday-records\
 4. Haz clic en **Continuar** o **Ir** al fondo de la página
 5. Espera a que termine. Verás un mensaje de éxito y la base de datos `yesterdays_records` aparecerá en el panel izquierdo
 
-### 4. Configurar el archivo de claves
+### 4. Configurar variables de entorno
 
-Crea el archivo `config/keys.php` con este contenido:
+Copia el archivo `.env.example` como `.env`:
 
-```php
-<?php
-    define("APP_URL", "http://localhost/yesterday-records");
-    define("STRIPE_SECRET", "sk_test_TU_CLAVE_AQUI");
+```bash
+cp .env.example .env
+```
+
+Edita `.env` con tus datos:
+
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=
+DB_NAME=yesterdays_records
+APP_URL=http://localhost/yesterday-records
+STRIPE_SECRET=sk_test_TU_CLAVE_AQUI
 ```
 
 - `APP_URL` — La dirección donde corre tu proyecto
@@ -103,6 +114,8 @@ Crea el archivo `config/keys.php` con este contenido:
 ```
 yesterday-records/
 ├── index.html                 # Punto de entrada SPA (único archivo HTML)
+├── .env.example               # Plantilla de variables de entorno
+├── .env                       # Variables de entorno (NO subir a git)
 ├── api/                       # Endpoints PHP (backend)
 │   ├── auth.php               # Login, registro, verificación
 │   ├── products.php           # Catálogo de productos
@@ -111,12 +124,12 @@ yesterday-records/
 │   ├── checkout.php           # Pago con Stripe
 │   ├── profile.php            # Perfil del usuario
 │   ├── addresses.php          # Direcciones del usuario
-│   ├── admin.php              # CRUD de administrador
+│   ├── admin.php              # CRUD admin + gestión de pedidos
 │   ├── categories.php         # Categorías
 │   ├── genres.php             # Géneros musicales
 │   └── cities.php             # Ciudades
 ├── config/                    # Configuración
-│   ├── database.php           # Conexión a MySQL + crea vistas
+│   ├── database.php           # Conexión a MySQL (lee de .env)
 │   ├── keys.php               # Claves secretas (NO subir a git)
 │   ├── helpers.php            # Funciones auxiliares (respond, success, error)
 │   └── views.php              # Vistas MySQL del catálogo
@@ -142,16 +155,19 @@ yesterday-records/
 │   ├── checkout.js            # Lógica de pago
 │   ├── auth.js                # Login y registro
 │   ├── profile.js             # Perfil y direcciones
-│   ├── product.js             # Detalle de producto
 │   ├── admin-products.js      # CRUD productos (admin)
 │   ├── admin-orders.js        # Gestión pedidos (admin)
 │   ├── utils.js               # Funciones utilitarias
-│   └── effects.js             # Efectos visuales
+│   └── effects.js             # Efectos visuales (scroll reveal, partículas)
 ├── styles/
-│   └── style.css              # Estilos globales
-├── assets/                    # Imágenes estáticas
+│   ├── style.css              # Estilos globales
+│   └── effects.css            # Estilos de micro-interacciones
+├── assets/                    # Imágenes y recursos estáticos
+│   ├── favicon.ico            # Icono de pestaña (YR)
+│   ├── favicon.png            # Icono de pestaña (PNG)
 │   ├── default.webp           # Imagen por defecto de productos
-│   └── vinilos.jpg            # Imagen de fondo
+│   ├── vinilos.webp           # Imagen de fondo del hero
+│   └── home.png               # Screenshot del sitio
 ├── sql/
 │   └── yesterdays_records.sql # Script de base de datos + datos de prueba
 └── .gitignore                 # Archivos ignorados por git
@@ -170,6 +186,10 @@ Cada archivo en `api/` es un endpoint independiente. No hay framework, solo PHP 
 ### Base de datos
 
 El script SQL crea automáticamente vistas MySQL (`v_products`, `v_order_detail`) que facilitan las consultas del catálogo. Estas vistas se recrean en cada petición desde `config/database.php`.
+
+### Variables de entorno
+
+El proyecto detecta automáticamente si está en desarrollo (localhost) o producción, y carga las credenciales de base de datos desde el archivo `.env`. Nunca subas `.env` a git.
 
 ## Cuentas de Stripe (modo test)
 
