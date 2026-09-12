@@ -127,7 +127,8 @@ function resolveRoute(cleanHash) {
 }
 
 function checkPermissions(cleanHash) {
-    if (!session.logged_in && !publicRoutes.includes(cleanHash)) {
+    var isPublic = publicRoutes.includes(cleanHash) || cleanHash.startsWith("#/product/");
+    if (!session.logged_in && !isPublic) {
         return { redirect: "#/login" };
     }
     if (cleanHash.startsWith("#/admin") && session.role !== "admin") {
@@ -250,6 +251,10 @@ function scrollToCatalog() {
 }
 
 async function init() {
+    if (window.location.search) {
+        history.replaceState(null, "", window.location.pathname + (window.location.hash || "#/home"));
+    }
+
     var navbar = await $.get("views/navbar.html");
     $("#navbar").html(navbar);
 
