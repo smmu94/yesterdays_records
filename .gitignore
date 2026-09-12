@@ -2,3 +2,4 @@ docs/
 config/keys.php
 /vendor/
 uploads/
+.env

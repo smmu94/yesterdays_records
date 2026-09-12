@@ -1,4 +1,24 @@
 <?php
-    $con = new mysqli("sql102.infinityfree.com", "if0_42885270", "Smmu24940729", "if0_42885270_yesterdays_records");
+    $envFile = __DIR__ . "/../.env";
+    if (file_exists($envFile)) {
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos(trim($line), "#") === 0) continue;
+            if (strpos($line, "=") === false) continue;
+            list($key, $value) = explode("=", $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            if (!getenv($key)) {
+                putenv("$key=$value");
+            }
+        }
+    }
+
+    $con = new mysqli(
+        getenv("DB_HOST") ?: "localhost",
+        getenv("DB_USER") ?: "root",
+        getenv("DB_PASS") ?: "",
+        getenv("DB_NAME") ?: "yesterdays_records"
+    );
     $con->set_charset("utf8mb4");
 ?>
