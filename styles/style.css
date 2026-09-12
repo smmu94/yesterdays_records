@@ -516,7 +516,7 @@ h6 {
    ============================================ */
 .hero {
     height: 100%;
-    background: url("./../assets/vinilos.jpg") no-repeat center center;
+    background: url("./../assets/vinilos.webp") no-repeat center center;
     background-size: cover;
     display: flex;
     align-items: center;
@@ -1329,5 +1329,24 @@ h6 {
 
     .modal-content {
         border-radius: var(--radius-md);
+    }
+
+    .modal-dialog:not(.modal-fullscreen) {
+        max-width: calc(100vw - 1rem);
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-body .table-responsive {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
+
+    .modal-body .table td,
+    .modal-body .table th {
+        padding: 0.5rem;
+        font-size: var(--text-sm);
     }
 }
