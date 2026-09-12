@@ -37,7 +37,7 @@
         $limit = 100;
         $offset = ($page - 1) * $limit;
 
-        $sql = "SELECT p.*, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
+        $sql = "SELECT p.id_product, p.name, p.description, p.artist, p.price, p.stock, p.id_category, p.id_genre, p.date, COALESCE(NULLIF(p.image, ''), 'assets/default.webp') AS image, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
         $countSql = "SELECT COUNT(*) AS total FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
         $condition = "";
         $types = "";
@@ -200,13 +200,13 @@
         $params = [];
 
         if (isset($_GET["status"]) && $_GET["status"] != "") {
-            $condition .= " AND status = ?";
+            $condition .= " AND o.status = ?";
             $types .= "s";
             $params[] = $_GET["status"];
         }
         if (isset($_GET["search"]) && $_GET["search"] != "") {
             $search = "%" . $_GET["search"] . "%";
-            $condition .= " AND (client_name LIKE ? OR email LIKE ?)";
+            $condition .= " AND (u.name LIKE ? OR u.email LIKE ?)";
             $types .= "ss";
             $params[] = $search;
             $params[] = $search;
@@ -258,6 +258,107 @@
             $stmt->close();
             success(["items" => []]);
         }
+    }
+
+    if ($action === "update_order_status") {
+        $id = intval($_POST["id_order"]);
+        $newStatus = $_POST["status"] ?? "";
+        $allowed = ["pending", "paid", "sent"];
+        if (!in_array($newStatus, $allowed)) {
+            error("Estado no válido");
+        }
+
+        $stmt = $con->prepare("UPDATE orders SET status = ? WHERE id_order = ?");
+        $stmt->bind_param("si", $newStatus, $id);
+        if ($stmt->execute()) {
+            $stmt->close();
+            success();
+        } else {
+            $stmt->close();
+            error("Error al actualizar estado");
+        }
+    }
+
+    if ($action === "delete_order") {
+        $id = intval($_POST["id_order"]);
+
+        $stmt = $con->prepare("SELECT status FROM orders WHERE id_order = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if (!$res || $res->num_rows === 0) {
+            $stmt->close();
+            error("Pedido no encontrado");
+        }
+        $order = $res->fetch_assoc();
+        $stmt->close();
+
+        if ($order["status"] === "paid" || $order["status"] === "sent") {
+            $stmt = $con->prepare("SELECT id_product, quantity FROM order_detail WHERE id_order = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            foreach ($items as $item) {
+                $stmt = $con->prepare("UPDATE products SET stock = stock + ? WHERE id_product = ?");
+                $stmt->bind_param("ii", $item["quantity"], $item["id_product"]);
+                $stmt->execute();
+                $stmt->close();
+            }
+        }
+
+        $stmt = $con->prepare("DELETE FROM order_detail WHERE id_order = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $con->prepare("DELETE FROM orders WHERE id_order = ?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $stmt->close();
+            success();
+        } else {
+            $stmt->close();
+            error("Error al eliminar pedido");
+        }
+    }
+
+    if ($action === "cancel_stale_orders") {
+        $stmt = $con->prepare("SELECT id_order FROM orders WHERE status = 'pending' AND date < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $stale = $res->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        $cancelled = 0;
+        foreach ($stale as $order) {
+            $id = $order["id_order"];
+
+            $stmt = $con->prepare("SELECT id_product, quantity FROM order_detail WHERE id_order = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            foreach ($items as $item) {
+                $stmt = $con->prepare("UPDATE products SET stock = stock + ? WHERE id_product = ?");
+                $stmt->bind_param("ii", $item["quantity"], $item["id_product"]);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $stmt = $con->prepare("DELETE FROM order_detail WHERE id_order = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $con->prepare("DELETE FROM orders WHERE id_order = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+            $cancelled++;
+        }
+
+        success(["cancelled" => $cancelled]);
     }
 
     error("Acción no válida");
