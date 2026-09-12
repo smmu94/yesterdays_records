@@ -6,7 +6,7 @@
     $limit = max(1, min(50, intval($_GET["limit"] ?? 20)));
     $offset = ($page - 1) * $limit;
 
-    $sql = "SELECT p.*, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
+    $sql = "SELECT p.id_product, p.name, p.description, p.artist, p.price, p.stock, p.id_category, p.id_genre, p.date, COALESCE(NULLIF(p.image, ''), 'assets/default.webp') AS image, c.name AS category_name, g.name AS genre_name FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
     $countSql = "SELECT COUNT(*) AS total FROM products p INNER JOIN categories c ON p.id_category = c.id_category LEFT JOIN genres g ON p.id_genre = g.id_genre";
     $condition = "";
     $types = "";
